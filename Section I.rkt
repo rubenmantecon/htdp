@@ -81,9 +81,9 @@
 
 ; ---------------------------------------------
 
-(define CAT .)
+(define CAT "cat")
 
-(define CAT-2 .)
+(define CAT-2 "cat 2")
 
 (define CAT-WIDTH (* (image-width CAT) 4))
 
@@ -146,7 +146,7 @@
 (define WIDTH  100)
 (define HEIGHT  60)
 (define MTSCN  (empty-scene WIDTH HEIGHT))
-(define ROCKET .)
+(define ROCKET "rocket")
 (define ROCKET-CENTER-TO-TOP
   (- HEIGHT (/ (image-height ROCKET) 2)))
 
