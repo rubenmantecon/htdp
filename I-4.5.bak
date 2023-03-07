@@ -86,10 +86,8 @@
 ;LRCD -> LRCD
 (define (main2 s)
   (big-bang s
-    [to-draw show]
     [on-key launch]
+    [to-draw show]
     [on-tick fly 0.02]
-    [stop-when (= (cond
-                   [(not (string? s)) s])
-                  HEIGHT)]
+    [stop-when (fly HEIGHT)]
     ))
