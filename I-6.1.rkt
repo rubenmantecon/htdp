@@ -52,13 +52,37 @@
 
 ; My interpretation: en esta itemización, cada struct representa el estado de todos los ítems presentes en el mundo. Por tanto, sólo considera dos casos realmente distintos: cuando se ha disparado un misil, y cuando no. Cuando no se ha disparado, el UFO y el tanque tienen unas posiciones particulares (que varían en función del input y de los ticks del reloj). Cuando se ha disparado, entra en juego también la posición del misil. De ahí que exista un struct de structs que contenga cada elemento que forma parte del mundo.
 
+;; SIGS -> Image
+;; adds TANK, UFO, and possibly MISSILE to 
+;; the BACKGROUND scene
+;(define (si-render s)
+;  (cond
+;    [(aim? s) (... (aim-tank s) ... (aim-ufo s) ...)]
+;    [(fired? s) (... (fired-tank s) ... (fire-ufo s) ... (fired-missile s) ...)]))
+
+; Tank Image -> Image 
+; adds t to the given image im
+(define (tank-render t im) im)
+ 
+; UFO Image -> Image 
+; adds u to the given image im
+(define (ufo-render u im) im)
+
 ; SIGS -> Image
-; adds TANK, UFO, and possibly MISSILE to 
-; the BACKGROUND scene
+; renders the given game state on top of BACKGROUND 
+; for examples see figure 32
 (define (si-render s)
   (cond
-    [(aim? s) (... (aim-tank s) ... (aim-ufo s) ...)]
-    [(fired? s) (... (fired-tank s) ... (fire-ufo s) ... (fired-missile s) ...)]))
+    [(aim? s)
+     (tank-render (aim-tank s)
+                  (ufo-render (aim-ufo s) BACKGROUND))]
+    [(fired? s)
+     (tank-render
+      (fired-tank s)
+      (ufo-render (fired-ufo s)
+                  (missile-render (fired-missile s)
+                                  BACKGROUND)))]))
 
+; Figure 33: The complete rendering function
 
 
