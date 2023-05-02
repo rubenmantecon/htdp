@@ -60,14 +60,6 @@
 ;    [(aim? s) (... (aim-tank s) ... (aim-ufo s) ...)]
 ;    [(fired? s) (... (fired-tank s) ... (fire-ufo s) ... (fired-missile s) ...)]))
 
-; Tank Image -> Image 
-; adds t to the given image im
-(define (tank-render t im) im)
- 
-; UFO Image -> Image 
-; adds u to the given image im
-(define (ufo-render u im) im)
-
 ; SIGS -> Image
 ; renders the given game state on top of BACKGROUND 
 ; for examples see figure 32
@@ -84,5 +76,20 @@
                                   BACKGROUND)))]))
 
 ; Figure 33: The complete rendering function
+
+; Tank Image -> Image 
+; adds t to the given image im
+(define (tank-render t im)
+  (place-image TANK (posn-x t) (posn-y t) im))
+ 
+; UFO Image -> Image 
+; adds u to the given image im
+(define (ufo-render u im)
+  (place-image UFO (posn-x u) (posn-y t) im))
+
+; Missile Image -> Image
+; adds m to the given image im
+(define (missile-render m im)
+  (place-image MISSILE (posn-x m) (posn-y m))im)
 
 
