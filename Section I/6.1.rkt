@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname I-6.1) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname |6.1|) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
 ;Exercise 94. Draw some sketches of what the game scenery looks like at various stages. Use the sketches to determine the constant and the variable pieces of the game. For the former, develop physical and graphical constants that describe the dimensions of the world (canvas) and its objects. Also develop some background scenery. Finally, create your initial scene from the constants for the tank, the UFO, and the background.
 
 (define WIDTH 400)
@@ -60,6 +60,7 @@
 ;    [(aim? s) (... (aim-tank s) ... (aim-ufo s) ...)]
 ;    [(fired? s) (... (fired-tank s) ... (fire-ufo s) ... (fired-missile s) ...)]))
 
+
 ; SIGS -> Image
 ; renders the given game state on top of BACKGROUND 
 ; for examples see figure 32
@@ -93,4 +94,35 @@
   (place-image MISSILE (posn-x m) (posn-y m))im)
 
 
+;Exercise 97. Design the functions tank-render, ufo-render, and missile-render. Compare this expression:
+;
+;    (tank-render
+;      (fired-tank s)
+;      (ufo-render (fired-ufo s)
+;                  (missile-render (fired-missile s)
+;                                  BACKGROUND)))
+;
+;with this one:
+;
+;    (ufo-render
+;      (fired-ufo s)
+;      (tank-render (fired-tank s)
+;                   (missile-render (fired-missile s)
+;                                   BACKGROUND)))
+;
+; When do the two expressions produce the same result?
+
+; Tank Image -> Image 
+; adds t to the given image im
+(define (tank-render t im)
+  ())
+
+; UFO Image -> Image 
+; adds u to the given image im
+; (define (ufo-render u im)
+
+; Missile Image -> Image 
+; adds m to the given image im
+; (define (missile-render m im) im)
+ 
 

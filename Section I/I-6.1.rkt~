@@ -68,6 +68,10 @@
 ; adds u to the given image im
 (define (ufo-render u im) im)
 
+; Missile Image -> Image
+; adds m to the given image im
+(define (missile-render m im) im)
+
 ; SIGS -> Image
 ; renders the given game state on top of BACKGROUND 
 ; for examples see figure 32
