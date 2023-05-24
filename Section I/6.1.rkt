@@ -13,3 +13,6 @@
                (rectangle 30 10 "solid" "magenta")))
 (define MISSILE
   (triangle 2 "solid" "firebrick"))
+(define smth (
+  wow
+))
