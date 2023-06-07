@@ -15,17 +15,17 @@ In this context, “systematic program design” refers to a mix of two concepts
 Here's the first and most fundamental **design recipe**:
 
 1. **From Problem Analysis to Data Definitions**
-  Identify the information that must be represented and how it is represented in the chosen programming language. Formulate data definitions and illustrate them with examples.
+    Identify the information that must be represented and how it is represented in the chosen programming language. Formulate data definitions and illustrate them with examples.
 2. **Signature, Purpose Statement, Header**
-  State what kind of data the desired function consumes and produces.  Formulate a concise answer to the question what the function computes. Define a stub that lives up to the signature.
+    State what kind of data the desired function consumes and produces.  Formulate a concise answer to the question what the function computes. Define a stub that lives up to the signature.
 3. **Functional Examples**
-  Work through examples that illustrate the function’s purpose.
+    Work through examples that illustrate the function’s purpose.
 4. **Function Template**
-  Translate the data definitions into an outline of the function.
+    Translate the data definitions into an outline of the function.
 5. **Function Definition**
-  Fill in the gaps in the function template. Exploit the purpose statement and the examples.
+    Fill in the gaps in the function template. Exploit the purpose statement and the examples.
 6. **Testing**
-  Articulate the examples as tests and ensure that the function passes all. Doing so discovers mistakes. Tests also supplement examples in that they help others read and understand the definition when the need arises—and it will arise for any serious program.
+    Articulate the examples as tests and ensure that the function passes all. Doing so discovers mistakes. Tests also supplement examples in that they help others read and understand the definition when the need arises—and it will arise for any serious program.
 
 **Iterative refinement** recommends stripping away all inessential details at first and finding a solution for the remaining core problem. A refinement step adds in one of these omitted details and re-solves the expanded problem, using the existing solution as much as possible. A repetition, also called an iteration, of these refinement steps eventually leads to a complete solution.
 
@@ -77,15 +77,18 @@ Since this knowledge is so important for everyone who reads the program, we ofte
 
 Here is a data definition for one of the above examples:
 
-> ; A *Temperature* is a `Number`
->
-> ; **interpretation** represents Celsius degrees
+```scheme
+; A Temperature is a Number
+; interpretation represents Celsius degrees
+```
 
 #### The Design Process
 
 1. Express how you wish to represent information as data. A one-line comment suffices:
 
-   > ; We use numbers to represent centimeters.
+   ```scheme
+   ; We use numbers to represent centimeters.
+   ```
 
    Formulate data definitions for the classes of data that you consider necessary for the success of your program.
 
@@ -141,7 +144,7 @@ Not all programs consist of a single function definition. Some require several f
 The design recipe for world programs, like the one for functions, is a tool for systematically moving from a problem statement to a working program. It consists of three big steps and one small one:
 
 1. For all those properties of the world that remain the same over time and are needed to render it as an `Image` **introduce constants**.
-   1. “Physical” constants describe general attributes of objects in the world, such as the speed or velocity of an object, its color, its height, its width, its radius, and so forth. It's a good practice to compute constants from others
+   1. “Physical” constants describe general attributes of objects in the world, such as the speed or velocity of an object, its color, its height, its width, its radius, and so forth. It's a good practice to compute constants from others.
    2. Graphical constants are images of objects in the world. They are generated with the appropriate rendering functions, which will very likely employ the "physical" constants.
 2. Those properties that change over time—in reaction to clock ticks, keystrokes, or mouse actions—give rise to the current state of the world. So, it's necessary to develop a data definition (*WorldState* or similar) *that **encompasses all the possible states** of the world, **each state represented by its respective data representation**.* 
 3. Once that is defined, it is necessary to design a number of functions that a `big-bang` expression needs in order to perform correctly. That means:
@@ -152,7 +155,7 @@ The design recipe for world programs, like the one for functions, is a tool for 
 
 ### 4 Intervals, Enumerations, and Itemizations
 
-#### 4.1 Programming with Conditionals
+### 4.1 Programming with Conditionals
 
 In many problem contexts, a function must distinguish several different situations. With a `cond` expression, you can use one line per possibility and thus remind the reader of the code for the different situations from the problem statement.
 
@@ -168,7 +171,7 @@ Chooses a clause based on some condition. `cond` finds the first *question-expre
 
 If none of the *question-expressions* evaluates to #true, `conds`’s value is the *answer-expression* of the `else` clause. If there is no `else`, `cond` reports an error. If the result of a *question-expression* is neither #true nor #false,  also reports an error.
 
-#### 4.3 Enumerations
+### 4.3 Enumerations
 
 *Enumerations* are a fixed, finite amount of elements from a class, in which every possibility is listed:
 
@@ -182,7 +185,7 @@ If none of the *question-expressions* evaluates to #true, `conds`’s value is t
 ; – "leave"
 ```
 
-#### 4.4 Intervals
+### 4.4 Intervals
 
 *Intervals* are collections of elements that satisfy a specific property, contained within boundaries. The simplest interval has two boundaries: left and right. If the left boundary is to be included in the interval, we say it is *closed* on the left. Similarly, a right-closed interval includes its right boundary. Finally, if an interval does not include a boundary, it is said to be *open* at that boundary.
 
@@ -204,7 +207,7 @@ If none of the *question-expressions* evaluates to #true, `conds`’s value is t
 
 In general, intervals deserve special attention when you make up examples, that is, they deserve at least three kinds of examples: one from each end and another one from inside. Also, it is necessary to take into account if the boundaries are open or not, and what to do in each case(s). Certain special values (minimums, maximums, 0...) may need to be accounted for, too.
 
-#### 4.5 Itemizations
+### 4.5 Itemizations
 
 An interval distinguishes different sub-classes of numbers, which, in principle, is an infinitely large class.  An enumeration spells out item for item the useful elements of an existing class of data. Some data definitions need to include elements from both. They use *itemizations*, which generalize intervals and enumerations.
 
@@ -229,19 +232,230 @@ Where `1String` refers to what is normally understood as `char` in other languag
    1. If a sub-class is also a finite interval, it's necessary to pick examples that account for the boundaries and its interior.
 4. **The template mirrors the organization of sub-classes with a `cond`**. This means:
    1. The function’s body must be a conditional expression with as many clauses as there are distinct sub-classes in the data definition.
-   2. You must formulate one condition expression per `cond` line. Each expression involves the function parameter and identifies one of the sub-classes of data in the data definition.
+   2. You must formulate one condition expression per `cond` line. Each expression involves the function parameter and one of the sub-classes of data in the data definition.
 5. Now that is time to code, go for each `cond` line, assume the input parameter meets the condition and therefore exploit its corresponding test cases. To formulate the corresponding result expression, you write down the computation for this example as an expression that involves the function parameter in some way.
 6. Your attitude and behavior regarding tests keeps being the same.
 
 ### 4.7 Finite State Worlds
 
+![image](https://htdp.org/2023-3-6/Book/pict_60.png)
 
+The left-hand side of [Figure 26](https://htdp.org/2023-3-6/Book/part_one.html#(counter._(figure._fig~3atraffic-light)) summarizes this description as a *state transition diagram*. Such a diagram consists of *states* and arrows that connect these states. Each state depicts a traffic light in one particular configuration: red, yellow, or green. Each arrow shows how the world can change, from which state it can *transition* to another state. Our sample diagram contains three arrows, because there are three possible ways in which the traffic light can change. Labels on the arrows indicate the reason for changes; a traffic light transitions from one state to another as time passes.
 
+Computer scientists call such diagrams *finite state machines* (FSM), also known as *finite state automata* (FSA). Despite their simplicity, FSMs/FSAs play an important role in computer science.
 
+### 5 Adding Structure
 
-Apartado 6.1: Revisión de la Designt Recipe -> Hay más por extraer
+Your cell phone is mostly a few million lines of code wrapped in plastic. Among other things, it administrates your contacts. Each contact comes with a name, a phone number, an email address, and perhaps some other information. When you have lots of contacts, each single contact is best represented as a single piece of data; otherwise the various pieces could get mixed up by accident.
 
-To complete the definition, we figure out for each cond line how to combine the values we have in order to compute the expected result. Beyond the pieces of the input, we may also use globally defined constants, for example, BACKGROUND, which is obviously of help here; primitive or built-in operations; and, if all else fails, wish-list functions, that is, we describe functions we wish we had.
+Because of such programming problems, every programming language provides some mechanism to combine several pieces of data into a single piece of *compound data* and ways to retrieve the constituent values when needed.
 
+### 5.4 Defining Structures
 
+A *structure type definition* is another form of definition, distinct from constant and function definitions. A structure type definition actually defines functions. But, unlike an ordinary function definition, **a structure type definition defines many functions** simultaneously. Specifically, it defines three kinds of functions:
 
+- one *constructor*, a function that creates *structure instances*. It takes as many values as there are fields; as mentioned, *structure* is short for structure instance. The phrase *structure type* is a generic name for the collection of all possible instances;
+- one *selector* per field, which extracts the value of the field from a structure instance; and
+- one *structure predicate*, which, like ordinary predicates, distinguishes instances from all other kinds of values.
+
+A program can use these as if they were functions or built-in primitives.
+
+Every structure type definition introduces a new kind of structure, distinct from all others. Programmers want this kind of expressive power because they wish to convey an **intention** with the structure name. Wherever a structure is created, selected, or tested, the text of the program explicitly reminds the reader of this intention.
+
+Since structures are values, just like numbers or Booleans or strings, it makes sense that one instance of a structure occurs inside another instance.
+
+### 5.5 Computing with Structures
+
+Let us first look at a diagrammatic way to think about structure instances as lockboxes with as many compartments as there are fields. Here is a representation of (previously defined structure called *entry*)
+
+```scheme
+(define pl (make-entry "Al Abe" "666-7771" "lee@x.me"))
+```
+
+as such diagram:
+
+![image](https://htdp.org/2023-3-6/Book/pict_70.png)
+
+Not surprisingly, nested structure instances have a diagram of boxes nested in boxes. 
+
+![image](https://htdp.org/2023-3-6/Book/pict_72.png)
+
+### 5.6 Programming with Structures
+
+Remember that a data definition provides a way of representing information into data and interpreting that data as information. For structure types, this calls for a description of what kind of data goes into which field. For some structure type definitions, formulating such descriptions is easy and obvious:
+
+```scheme
+(define-struct posn [x y])
+; A Posn is a structure: 
+;   (make-posn Number Number)
+; interpretation a point x pixels from left, y from top
+```
+
+> *If a function deals with nested structures, develop one function per level of nesting.*
+
+### 5.7 The Universe of Data
+
+Every language comes with a universe of data. This data represents information from and about the external world; it is what programs manipulate. This universe of data is a collection that not only contains all built-in data but also any piece of data that any program may ever create.
+
+Neither programs nor individual functions in programs deal with the entire universe of data. It is the purpose of a data definition to describe parts of this universe and to name these parts so that we can refer to them concisely.  Put differently, a named data definition is a description of a collection of data, and that name is usable in other data definitions and in function signatures. In a function signature, the name specifies what data a function will deal with and, implicitly, which part of the universe of data it won’t deal with.
+
+Since data definitions play such a central and important role in the design process, it is often best to illustrate data definitions with examples just like we illustrate the behavior of functions with examples. And indeed, creating data examples from a data definition is straightforward:
+
+- for a built-in collection of data (number, string, Boolean, images), choose **your favorite examples**;
+- for an enumeration, use **several of the items** of the enumeration;
+- for intervals, use the **end points** (if they are included) and **at least one interior point**;
+- for itemizations, **deal with each part separately**; and
+- for data definitions for structures, follow the natural language description; that is, **use the constructor and pick an example from the data collection named for each field**.
+
+### 5.8 Designing with Structures
+
+#### Design Recipe Update: Structures
+
+This section adds a design recipe, illustrating it with the following:
+
+> **Sample Problem** Design a function that computes the distance of objects in a 3-dimensional space to the origin.
+
+1. When a problem calls for the representation of pieces of information that belong together or describe a natural whole, you need a structure type definition.
+
+   To ensure that we can create instances, our data definitions should come with **data examples**.
+
+   ```scheme
+   (define-struct r3 [x y z])
+   ; An R3 is a structure:
+   ;   (make-r3 Number Number Number)
+    
+   (define ex1 (make-r3 1 2 13))
+   (define ex2 (make-r3 -1 0 3))
+   ```
+
+2. The second step remains unchanged.
+
+3. The third step remains unchanged.
+
+4. A function that consumes structures usually—though not always—extracts the values from the various fields in the structure. To remind yourself of this possibility, add a selector for each field to the templates for such functions.
+
+   ```scheme
+   ; R3 -> Number 
+   ; determines the distance of p to the origin 
+   (define (r3-distance-to-0 p)
+     (... (r3-x p) ... (r3-y p) ... (r3-z p) ...))
+   ```
+
+5. The fifth step remains unchanged.
+
+6. The sixth step remains unchanged.
+
+### 5.9 Structure in the World
+
+When a world program must track two independent pieces of information, we must use a collection of structures to represent the world state data. One field keeps track of one piece of information and the other field the second piece of information. Naturally, if the domain world contains more than two independent pieces of information, the structure type definition must specify as many fields as there are distinct pieces of information.
+
+### 6.1 Designing with Itemizations, Again
+
+#### Design Recipe Update: Itemizations and Structures
+
+1. An itemization of different forms of data—including collections of structures—is required when your problem statement distinguishes different kinds of information and when at least some of these pieces of information consist of several different pieces.
+
+2. The second step remains unchanged.
+
+3. The third step remains unchanged.
+
+4. The development of the template now exploits two different dimensions: the itemization itself and the use of structures in its clauses.
+
+   By the first, the body of the template consists of a `cond` expression that has as many `cond` clauses as the itemizations has items. Furthermore, you must add a condition to each `cond` clause that identifies the sub-class of data in the corresponding item. Recall this similar advice from Design Recipe Update with Itemizations from section 4.6.
+
+   By the second, if an item deals with a structure, the template contains the selector expressions—in the `cond` clause that deals with the sub-class of data described in the item. Recall this similar advice from Design Recipe Update with Structures from section 5.8.
+
+   If said structure contains custom data definitions, you do **not** add selector expressions. Instead, you create a template for the separate data definition to the task at hand and refer to that template with a function call. 
+
+   **Before going through the work of developing a template**, briefly reflect on the nature of the function. If the problem statement suggests that there are several tasks to be performed, it is likely that a composition of several, separately designed functions is needed instead of a template.
+
+5. If you are stuck, fill the easy cases first and use default values for the others. While this makes some of the test cases fail, you are making progress and you can visualize this progress.
+
+   If you are stuck on some cases of the itemization, analyze the examples that correspond to those cases. Determine what the pieces of the template compute from the given inputs. Then consider how to combine these pieces (plus some constants) to compute the desired output.
+
+   Also, if your template “calls” another template because the data definitions refer to each other, assume that the other function delivers what its purpose statement and its examples promise.
+
+6. The sixth step remains unchanged.
+
+### 6.3 Input Errors
+
+One central point of this chapter concerns the role of predicates. They are critical when you must design functions that process mixes of data. Such mixes come up naturally when your problem statement mentions many different kinds of information, but they also come up when you hand your functions and programs to others. This section therefore presents one way of protecting programs from inappropriate inputs.
+
+#### Checked functions
+
+When designing a checked function, is that for all those values in the class of values for which the original function is defined, the checked version must produce the same results; for all others, it must signal an error. So we only need to write the behavior for the data definitions of the original version (which will be the same, managed by a `cond` clause), and use an `else` for the rest:
+
+```scheme
+; Any -> Number
+; computes the area of a disk with radius v, 
+; if v is a number
+(define (checked-area-of-disk v)
+  (cond
+    [(number? v) (area-of-disk v)]
+    [else (error "area-of-disk: number expected")]))
+```
+
+> This book focuses on the design process for proper program design, and, to do this without distraction, we agree that we always adhere to data definitions and signatures. At least, we almost always do so, and on rare occasions we may ask you to design checked versions of a function or a program.
+
+####  Predicates
+
+As with checked functions, a predicate doesn’t need all possible `cond` lines. Only those that might produce #true are required:
+
+```scheme
+; A MissileOrNot is one of: 
+; – #false
+; – Posn
+; interpretation #false means the missile is in the tank;
+; Posn says the missile is at that location
+
+(define (missile-or-not? v)
+  (cond
+    [(false? v) #true]
+    [(posn? v) #true]
+    [else #false]))
+```
+
+### Checking the World
+
+In a world program, many things can go wrong. Although we just agreed to trust that our functions are always applied to the proper kind of data, in a world program we may juggle too many things at once to place that much trust in ourselves. When we design a world program that takes care of clock ticks, mouse clicks, keystrokes, and rendering, it is just too easy to get one of those interplays wrong.
+
+To help with this kind of problem, `big-bang` comes with an optional `check-with` clause that accepts a predicate for world states. Those predicates can be built-in or custom made.
+
+### 6.5 Equality predicates
+
+An *equality predicate* is a function that compares two elements of the same collection of data. Custom ones can be made:
+
+```scheme
+; A TrafficLight is one of the following Strings:
+; – "red"
+; – "green"
+; – "yellow"
+; interpretation the three strings represent the three 
+; possible states that a traffic light may assume 
+
+; Any -> Boolean
+; is the given value an element of TrafficLight
+(define (light? x)
+  (cond
+    [(string? x) (or (string=? "red" x)
+                     (string=? "green" x)
+                     (string=? "yellow" x))]
+    [else #false]))
+
+; Any Any -> Boolean
+; are the two values elements of TrafficLight and, 
+; if so, are they equal
+(define (light=? a-value another-value)
+  (if (and (light? a-value) (light? another-value))
+      (string=? a-value another-value)
+      (error MESSAGE)))
+```
+
+### 7 Summary
+
+The most relevant things for myself:
+
+- Programming languages, including BSL, come with a rich set of libraries so that programmers don’t have to reinvent the wheel all the time. A programmer should become comfortable with the functions that a library provides, especially their signatures and purpose statements. Doing so simplifies life.
+- Make sure you understand the following terms: **structure type** definition, **function** definition, **constant** definition, **structure instance**, **data definition**, `big-bang`, and **event-handling function**.
+
+# Intermezzo 1: Beginning Student Language
