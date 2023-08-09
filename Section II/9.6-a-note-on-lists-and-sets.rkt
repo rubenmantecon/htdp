@@ -8,12 +8,26 @@
 (define (count los s)
   (cond
     [(empty? los) 0]
-    [else (if (string=? (first los) s)
+    [else (if (string-contains? s (first los))
               (add1 (count (rest los) s))
               (count (rest los) s))]
     ))
 
 (check-expect (count (cons "hey" (cons "hey" (cons "now" (cons "you're a rockstar" '())))) "hey") 2)
+
+; A Son.L is one of: 
+; – empty 
+; – (cons Number Son.L)
+	
+; A Son.R is one of: 
+; – empty 
+; – (cons Number Son.R)
+; 
+; Constraint If s is a Son.R, 
+; no number occurs twice in s
+; 
+; Son is used when it 
+; applies to Son.L and Son.R
 
 ; Son
 (define es '())
@@ -23,30 +37,43 @@
 (define (in? x s)
   (member? x s))
 
-; Number Son -> Son
-; subtracts x from s 
-(define (set- x s)
-  s)
-
 ; Number Son.L -> Son.L
-; removes x from s 
+; removes x from s
+(define (set-.L x s)
+  (remove-all x s))
+
 (define s1.L
   (cons 1 (cons 1 '())))
  
 (check-expect
-  (set-.L 1 s1.L) es)
- 
-(define (set-.L x s)
-  (remove-all x s))
+ (set-.L 1 s1.L) es)
 
-	
+; Number Son.R -> Son.R
+; removes x from s
+(define (set-.R x s)
+  (remove x s))
+
 ; Number Son.R -> Son.R
 ; removes x from s
 (define s1.R
   (cons 1 '()))
  
-(check-expect
-  (set-.R 1 s1.R) es)
- 
-(define (set-.R x s)
-  (remove x s))
+(check-expectR) es)
+
+; Exercise 160. Design the functions set+.L and set+.R, which create a set by adding a number x to some given set s for the left-hand and right-hand data definition, respectively
+
+; SoN.L -> Son.L
+; add x to a Son.L set
+(define (set+.L x s)
+  (cond
+    [(empty? s) (cons x '())]
+    [else (cons s (cons (x '())))]))
+
+; SoN.R -> SoN.R
+; add x to a SoN.R set
+(define (set+.R x s)
+  (cond
+    [(empty? s) (cons x '())]
+    [(member? x s) s]
+    [else (cons s (cons x '()))]))
+
