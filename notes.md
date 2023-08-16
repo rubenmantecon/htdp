@@ -458,4 +458,7 @@ The most relevant things for myself:
 - Programming languages, including BSL, come with a rich set of libraries so that programmers don’t have to reinvent the wheel all the time. A programmer should become comfortable with the functions that a library provides, especially their signatures and purpose statements. Doing so simplifies life.
 - Make sure you understand the following terms: **structure type** definition, **function** definition, **constant** definition, **structure instance**, **data definition**, `big-bang`, and **event-handling function**.
 
-# Intermezzo 1: Beginning Student Language
+# Section II Arbitrarly Large Data
+### 10.3 Lists in Lists, Files
+
+This idea of composing a built-in function with a newly designed function is common. Naturally, people don’t design functions randomly and expect to find something in the chosen programming language to complement their design. **Instead, program designers plan ahead and design the function to the output that available functions deliver**. More generally still and as mentioned above, it is common to think about a solution as a composition of two computations and to develop an appropriate data collection with which to communicate the result of one computation to the second one, where each computation is implemented with a function.
