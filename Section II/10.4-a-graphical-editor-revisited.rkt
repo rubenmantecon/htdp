@@ -13,9 +13,98 @@
 
 ; Lo1s -> Lo1s 
 ; produces a reverse version of the given list 
- 
 (check-expect
-  (rev (cons "a" (cons "b" (cons "c" '()))))
-  (cons "c" (cons "b" (cons "a" '()))))
+ (rev (cons "a" (cons "b" (cons "c" '()))))
+ (cons "c" (cons "b" (cons "a" '()))))
  
-(define (rev l) l)
+(define (rev l)
+  (cond
+    [(empty? l) '()]
+    [else  ( add-at-end (rev (rest l)) (first l))]))
+
+; Lo1s 1String -> Lo1s
+; creates a new list by adding s to the end of l
+(check-expect
+ (add-at-end (cons "c" (cons "b" '())) "a")
+ (cons "c" (cons "b" (cons "a" '()))))
+
+(check-expect (add-at-end '() "") (cons "" '()))
+ 
+(define (add-at-end l s)
+  (cond
+    [(empty? l) (cons s '())]
+    [(cons? l) (cons (first l) (add-at-end (rest l) s))]))
+
+; Ex 177
+
+(define HEIGHT 20) ; the height of the editor 
+(define WIDTH 200) ; its width 
+(define FONT-SIZE 16) ; the font size 
+(define FONT-COLOR "black") ; the font color 
+ 
+(define MT (empty-scene WIDTH HEIGHT))
+(define CURSOR (rectangle 1 HEIGHT "solid" "red"))
+
+; String String -> Editor
+; produce and Editor whose fields are s1 and s2
+(define (create-editor s1 s2)
+  (make-editor s1 s2))
+
+; Editor -> Image
+; renders an editor as an image of the two texts 
+; separated by the cursor 
+(define (editor-render e) MT)
+
+; Editor KeyEvent -> Editor
+; deals with a key event, given some editor
+(define (editor-kh ed ke)
+  (cond
+    [(string=? ke "left") (make-editor ... (editor-pre ed) (editor-post ed))]
+    [(string=? ke "right") (make-editor ... (editor-pre ed) (editor-post ed))]
+    [(string=? ke "\b") (make-editor ... (editor-pre ed) (editor-post ed))]))
+
+(check-expect (editor-kh (create-editor "" "") "e")
+              (create-editor "e" ""))
+
+(check-expect (editor-kh (create-editor "" "") "left")
+              (create-editor "" ""))
+
+(check-expect (editor-kh (create-editor "" "") "right")
+              (create-editor "" ""))
+
+(check-expect (editor-kh (create-editor "" "") "\b")
+              (create-editor "" ""))
+
+(check-expect (editor-kh (create-editor "" "a") "\b")
+              (create-editor "" "a"))
+
+(check-expect (editor-kh (create-editor "a" "") "\b")
+              (create-editor "" ""))
+
+(check-expect
+ (editor-kh (create-editor "cd" "fgh") "e")
+ (create-editor "cde" "fgh"))
+
+(check-expect
+ (editor-kh (create-editor "cde" "fgh") "right")
+ (create-editor "cdef" "gh"))
+
+(check-expect
+ (editor-kh (create-editor "cde" "fgh") "left")
+ (create-editor "cd" "efgh"))
+
+(check-expect
+ (editor-kh (create-editor "cd" "fgh") "\b")
+ (create-editor "c" "fgh"))
+
+(check-expect
+ (editor-kh (create-editor "c" "fgh") "\b")
+ (create-editor "" "fgh"))
+
+; main : String -> Editor
+; launches the editor given some initial string 
+(define (main s)
+  (big-bang (create-editor s "")
+    [on-key editor-kh]
+    [to-draw editor-render]))
+
