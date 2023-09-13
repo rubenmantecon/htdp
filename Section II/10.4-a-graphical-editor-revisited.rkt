@@ -20,7 +20,7 @@
 (define (rev l)
   (cond
     [(empty? l) '()]
-    [else  ( add-at-end (rev (rest l)) (first l))]))
+    [else  (add-at-end (rev (rest l)) (first l))]))
 
 ; Lo1s 1String -> Lo1s
 ; creates a new list by adding s to the end of l
@@ -48,58 +48,113 @@
 ; String String -> Editor
 ; produce and Editor whose fields are s1 and s2
 (define (create-editor s1 s2)
-  (make-editor s1 s2))
+  (make-editor (rev (explode s1))  (explode s2)))
+
+; Lo1s -> Image
+; renders a list of 1Strings as a text image 
+(define (editor-text s)
+  (text (implode s) FONT-SIZE FONT-COLOR))
 
 ; Editor -> Image
 ; renders an editor as an image of the two texts 
 ; separated by the cursor 
-(define (editor-render e) MT)
+(define (editor-render e)
+  (place-image/align
+    (beside (editor-text (editor-pre e))
+            CURSOR
+            (editor-text (editor-post e)))
+    1 1
+    "left" "top"
+    MT))
 
 ; Editor KeyEvent -> Editor
 ; deals with a key event, given some editor
-(define (editor-kh ed ke)
+(define (editor-kh ed k)
   (cond
-    [(string=? ke "left") (make-editor ... (editor-pre ed) (editor-post ed))]
-    [(string=? ke "right") (make-editor ... (editor-pre ed) (editor-post ed))]
-    [(string=? ke "\b") (make-editor ... (editor-pre ed) (editor-post ed))]))
+    [(key=? k "left") (editor-left ed)]
+    [(key=? k "right") (editor-right ed)]
+    [(key=? k "\b") (editor-del ed)]
+    [(key=? k "\t") ed]
+    [(key=? k "\r") ed]
+    [(= (string-length k) 1) (editor-ins ed k)]
+    [else ed]))
 
-(check-expect (editor-kh (create-editor "" "") "e")
-              (create-editor "e" ""))
+; Editor -> Editor
+; produces an editor with the cursor shifted one position to the right,
+; if possible
+(define (editor-right ed)
+  (cond
+    [(empty? (editor-post ed)) ed]
+    [else (make-editor (add-at-end (editor-pre ed) (first (editor-post ed)))
+                       (rest (editor-post ed)))]
+    ))
 
-(check-expect (editor-kh (create-editor "" "") "left")
-              (create-editor "" ""))
+(check-expect (editor-right (make-editor (cons "hey, joe" '()) '()))
+              (make-editor (cons "hey, joe" '()) '()))
 
-(check-expect (editor-kh (create-editor "" "") "right")
-              (create-editor "" ""))
 
-(check-expect (editor-kh (create-editor "" "") "\b")
-              (create-editor "" ""))
+(check-expect (editor-right (make-editor (cons "h" (cons "e" (cons "y" '())))
+                                         (cons "J" (cons "o" (cons "e" '())))))
+              (make-editor (cons "h" (cons "e" (cons "y" (cons "J" '()))))
+                           (cons "o" (cons "e" '()))))
 
-(check-expect (editor-kh (create-editor "" "a") "\b")
-              (create-editor "" "a"))
 
-(check-expect (editor-kh (create-editor "a" "") "\b")
-              (create-editor "" ""))
+
+; Editor -> Editor
+; produces an editor with the cursor shifted one position to the left,
+; if possible
+(define (editor-left ed)
+  (cond
+    [(empty? (editor-pre ed)) ed]
+    [else (make-editor (rev (rest (rev (editor-pre ed))))
+                       (cons (first (rev (editor-pre ed))) (editor-post ed)))]))
+
+(check-expect (editor-left (make-editor '()
+                                        (cons "hey, joe" '())))
+              (make-editor '()
+                           (cons "hey, joe" '())))
+
+(check-expect (editor-left (make-editor (cons "h" (cons "e" (cons "y" '())))
+                                        (cons "J" (cons "o" (cons "e" '())))) )
+              (make-editor (cons "h" (cons "e" '()))
+                           (cons "y" (cons "J" (cons "o" (cons "e" '()))))))
+ 
+
+; Editor -> Editor
+; deletes one character at the cursor position
+(define (editor-del ed)
+  (cond
+    [(empty? (editor-pre ed)) ed]
+    [else (make-editor (rev (rest (rev (editor-pre ed)))) (editor-post ed))]))
+
+
+(check-expect (editor-del (make-editor (cons "h" (cons "e" (cons "y" '())))
+                                        (cons "J" (cons "o" (cons "e" '())))) )
+              (make-editor (cons "h" (cons "e" '()))
+                           (cons "J" (cons "o" (cons "e" '())))))
+
+; Editor 1String -> Editor
+; inserts the 1String in (editor-post ed)
+(define (editor-ins ed k)
+  (make-editor (cons k (editor-pre ed))
+               (editor-post ed)))
 
 (check-expect
- (editor-kh (create-editor "cd" "fgh") "e")
- (create-editor "cde" "fgh"))
-
+ (editor-ins (make-editor '() '()) "e")
+ (make-editor (cons "e" '()) '()))
+ 
 (check-expect
- (editor-kh (create-editor "cde" "fgh") "right")
- (create-editor "cdef" "gh"))
+ (editor-ins
+  (make-editor (cons "d" '())
+               (cons "f" (cons "g" '())))
+  "e")
+ (make-editor (cons "e" (cons "d" '()))
+              (cons "f" (cons "g" '()))))
 
-(check-expect
- (editor-kh (create-editor "cde" "fgh") "left")
- (create-editor "cd" "efgh"))
 
-(check-expect
- (editor-kh (create-editor "cd" "fgh") "\b")
- (create-editor "c" "fgh"))
-
-(check-expect
- (editor-kh (create-editor "c" "fgh") "\b")
- (create-editor "" "fgh"))
+; Ex 180
+(define (editor-text-ni s)
+  (text ...))
 
 ; main : String -> Editor
 ; launches the editor given some initial string 
