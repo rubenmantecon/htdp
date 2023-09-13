@@ -58,11 +58,11 @@
 ; Editor -> Image
 ; renders an editor as an image of the two texts 
 ; separated by the cursor 
-(define (editor-render e)
+(define (editor-render ed)
   (place-image/align
-    (beside (editor-text (editor-pre e))
+    (beside (editor-text (reverse (editor-pre ed)))
             CURSOR
-            (editor-text (editor-post e)))
+            (editor-text (editor-post ed)))
     1 1
     "left" "top"
     MT))
@@ -154,7 +154,19 @@
 
 ; Ex 180
 (define (editor-text-ni s)
-  (text ...))
+  (text (implode-ni s) FONT-SIZE FONT-COLOR))
+
+
+(define (implode-ni los)
+  (cond
+    [(empty? los) ""]
+    [else (string-append (first los) (implode-ni (rest los))) ]))
+
+
+(check-expect
+  (editor-text-ni
+   (cons "p" (cons "o" (cons "s" (cons "t" '())))))
+  (text "post" FONT-SIZE FONT-COLOR))
 
 ; main : String -> Editor
 ; launches the editor given some initial string 
