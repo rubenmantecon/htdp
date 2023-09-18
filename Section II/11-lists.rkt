@@ -35,3 +35,54 @@
               (list 20 12 -5))
 
 ; Recursive insertion sort, cool
+
+; Ex 186
+
+; NEList-of-Temperatures -> Boolean
+; determines whether all temperatures are in descending order
+(define (sorted>? ne-l)
+  (cond
+    [(empty? (rest ne-l)) #true]
+    [else (if (> (first ne-l) (first (rest ne-l)))
+              (sorted>? (rest ne-l))
+              #false
+              )]))
+
+(check-satisfied (sort> (list 1 2 3 )) sorted>?)
+(check-satisfied (sort> (list 12 20 -5)) sorted>?)
+; (check-satisfied (list 12 20 -5) sorted>?)
+
+; Exercise 187.
+
+(define-struct gp [name score])
+; A GamePlayer is a structure: 
+;    (make-gp String Number)
+; interpretation (make-gp p s) represents player p who 
+; scored a maximum of s points
+
+(define PLAYER1 (make-gp "Robert" 12))
+(define PLAYER2 (make-gp "Anna" 54))
+(define PLAYER3 (make-gp "Dennis" 2))
+
+; List-of-GamePlayer -> List-of-GamePlayer
+; sort a list of GP in descending order of points
+(define (sort-gp lop)
+  (cond
+    [(empty? lop) '()]
+    [else (if (gp>? (first lop) (first (rest lop)))
+              (cons (first lop) (rest lop))
+              ...)]))
+
+(check-expect (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
+(check-expect (sort-gp (list PLAYER2 PLAYER1 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
+(check-satisfied (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) sorted>?)
+(check-satisfied (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) sorted>?)
+
+; GP -> Boolean
+; compare a struct of GP by its points
+(define (gp>? gp1 gp2)
+  (if (> (gp-score gp1) (gp-score gp2))
+      #true
+      #false))
+
+
