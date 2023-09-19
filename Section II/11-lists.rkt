@@ -26,8 +26,8 @@
     [(empty? alon) (list n)]
     [else (if (>= n (first alon))
               (cons n alon)
-              (cons (first alon) (insert n (rest alon))))]
-    ))
+              (cons (first alon) (insert n (rest alon))))]))
+    
 (check-expect (insert 4 '()) (list 4))
 (check-expect (insert 5 (list 6)) (list 6 5))
 (check-expect (insert 5 (list 4)) (list 5 4))
@@ -45,8 +45,8 @@
     [(empty? (rest ne-l)) #true]
     [else (if (> (first ne-l) (first (rest ne-l)))
               (sorted>? (rest ne-l))
-              #false
-              )]))
+              #false)]))
+              
 
 (check-satisfied (sort> (list 1 2 3 )) sorted>?)
 (check-satisfied (sort> (list 12 20 -5)) sorted>?)
@@ -69,14 +69,10 @@
 (define (sort-gp lop)
   (cond
     [(empty? lop) '()]
-    [else (if (gp>? (first lop) (first (rest lop)))
-              (cons (first lop) (rest lop))
-              ...)]))
+    [else (insert-gp (first lop) (sort-gp (rest lop)))]))
 
-(check-expect (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
-(check-expect (sort-gp (list PLAYER2 PLAYER1 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
-(check-satisfied (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) sorted>?)
-(check-satisfied (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) sorted>?)
+; (check-expect (sort-gp (list PLAYER1 PLAYER2 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
+; (check-expect (sort-gp (list PLAYER2 PLAYER1 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
 
 ; GP -> Boolean
 ; compare a struct of GP by its points
@@ -85,4 +81,19 @@
       #true
       #false))
 
+(check-expect (gp>? PLAYER1 PLAYER2) #false)
+(check-expect (gp>? PLAYER2 PLAYER3) #true)
+
+; GP LoGP -> LoGP
+; insert GP into descending-ordered LoGP
+(define (insert-gp gp lop)
+  (cond
+    [(empty? lop) (list gp)]
+    [(empty? gp) lop]
+    [(gp>? gp (first lop)) (cons gp lop)]
+    [else (cons (first lop) (insert-gp gp (rest lop)))]))
+
+(check-expect (insert-gp PLAYER1 '()) (list PLAYER1))
+(check-expect (insert-gp '() (list PLAYER2 PLAYER3)) (list PLAYER2 PLAYER3))
+(check-expect (insert-gp PLAYER1 (list PLAYER2 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
 
