@@ -97,3 +97,48 @@
 (check-expect (insert-gp '() (list PLAYER2 PLAYER3)) (list PLAYER2 PLAYER3))
 (check-expect (insert-gp PLAYER1 (list PLAYER2 PLAYER3)) (list PLAYER2 PLAYER1 PLAYER3))
 
+; Ex 188
+
+(define-struct email [from date message])
+; An Email Message is a structure: 
+;   (make-email String Number String)
+; interpretation (make-email f d m) represents text m 
+; sent by f, d seconds after the beginning of time
+
+(define EMAIL1 (make-email "David" 0 "Hello, World!"))
+(define EMAIL2 (make-email "Stern" 120 "Hey!"))
+(define EMAIL3 (make-email "DARPA" 12142039 "I think I will take care of this."))
+
+
+; LoE -> LoE
+; sort emails in descending order
+(define (sort-email> loe)
+  (cond
+    [(empty? loe) '()]
+    [else (insert-email (first loe) (sort-email> (rest loe)))]))
+
+; Email -> Email
+; Assert whether email-1 is older than mail-2
+(define (email>? email-1 email-2)
+  (if (> (email-date email-1) (email-date email-2))
+         #true
+         #false))
+
+; Email LoE -> LoE
+; insert Email into a descending ordered LoE
+(define (insert-email email loe)
+  (cond
+    [(empty? loe) (list email)]
+    [(empty? email) loe]
+    [else (if (email>? email (first loe))
+              (cons email loe)
+              (cons (first loe) (insert-email email (rest loe))))]))
+
+(define (sorted-email>? loe)
+  (cond
+    [(empty? (rest loe)) #true]
+    [else (if (email>? (first loe) (first (rest loe)))
+              (sorted>? (rest loe))
+              #false)]))
+
+(check-satisfied (sort-email> (list EMAIL3 EMAIL2 EMAIL1)) sorted-email>?)
