@@ -138,7 +138,12 @@
   (cond
     [(empty? (rest loe)) #true]
     [else (if (email>? (first loe) (first (rest loe)))
-              (sorted>? (rest loe))
+              (sorted-email>? (rest loe))
               #false)]))
 
 (check-satisfied (sort-email> (list EMAIL3 EMAIL2 EMAIL1)) sorted-email>?)
+
+; LoE -LoE
+; sort a LoE in lexicographically descending order
+(define (sort-email-by-name loe) loe)
+
