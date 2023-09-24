@@ -121,8 +121,8 @@
 ; Assert whether email-1 is older than mail-2
 (define (email>? email-1 email-2)
   (if (> (email-date email-1) (email-date email-2))
-         #true
-         #false))
+      #true
+      #false))
 
 ; Email LoE -> LoE
 ; insert Email into a descending ordered LoE
@@ -143,7 +143,36 @@
 
 (check-satisfied (sort-email> (list EMAIL3 EMAIL2 EMAIL1)) sorted-email>?)
 
-; LoE -LoE
-; sort a LoE in lexicographically descending order
-(define (sort-email-by-name loe) loe)
+; Ex 189
 
+; Number List-of-numbers -> Boolean
+(define (search n alon)
+  (cond
+    [(empty? alon) #false]
+    [else (or (= (first alon) n)
+              (search n (rest alon)))]))
+
+; Number List-of-numbers -> Boolean
+; determine whether some number occurs in a a sorted list of numbers
+(define (search-sorted n alon)
+  (cond
+    [(empty? alon) #false]
+    [else (or (> n (first alon))
+              (search-sorted n (rest alon)))]))
+
+; Ex 190
+
+; List-of-1String -> List-of-list-of-1String
+; produce a list of all prefixes of the input
+(define (prefixes l)
+  (cond
+    [(empty? l) '()]
+    [else (cons (prefix l) (prefixes (prefix (rest l))))]
+    ))
+
+; List-of-1String Number -> List-of-1String
+; produce a prefix of the specified length
+(define (prefix l)
+  (cond
+    [(empty? l) '()]
+    [else (cons (first l) (prefix (rest l)))]))
