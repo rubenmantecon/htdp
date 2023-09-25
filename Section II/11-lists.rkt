@@ -163,16 +163,21 @@
 ; Ex 190
 
 ; List-of-1String -> List-of-list-of-1String
-; produce a list of all prefixes of the input
+; produce a list of all suffixes of the input
+(define (suffixes l)
+  (cond
+    [(empty? l) '()]
+    [else (cons l (suffixes (rest l)))]))
+
 (define (prefixes l)
   (cond
     [(empty? l) '()]
-    [else (cons (prefix l) (prefixes (prefix (rest l))))]
-    ))
+    [else (reverse* (suffixes (reverse l))) ]))
 
-; List-of-1String Number -> List-of-1String
-; produce a prefix of the specified length
-(define (prefix l)
-  (cond
-    [(empty? l) '()]
-    [else (cons (first l) (prefix (rest l)))]))
+(define (reverse* ll)
+  (cond [(empty? ll) '()]
+        [else (cons (reverse (first ll)) (reverse* (rest ll)))]))
+
+(check-expect (prefixes (list "a")) (list (list "a")))
+(check-expect (prefixes (list "a" "b")) (list (list "a" "b") (list "a")))
+(check-expect (prefixes (list "a" "b" "c")) (list (list "a" "b" "c") (list "a" "b") (list "a")))
