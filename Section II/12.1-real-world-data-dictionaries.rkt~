@@ -26,31 +26,21 @@
          (starts-with# letter (rest dict)))
      ]))
 
-(check-expect (starts-with# "z" AS-LIST) 30)
-
-; A LetterCount is any of:
-; - '()
-; (list String Number LetterCount)
+; A Letter-Count is a structure:
+(define-struct lc [letter count])
+; (make-letter-count String Number)
+; represents the occurrence of a letter
 
 ; Dictionary -> List-of-Letter-Counts
 ; counts how often a word in a dictionary starts with each letter of the alphabet
 (define (count-by-letter dict)
   (cond
     [(empty? dict) '()]
-    [else
-
-    ;(if
-     (cons (starts-with# (string-ith (first dict) 0) dict) (count-by-letter (rest dict)))
-     ;(count-by-letter (rest dict)))
-     ]
+    [else (if (member? (string-ith (first dict) 0) LETTERS)
+              (count-by-letter (rest dict))
+              (cons (make-lc (string-ith (first dict) 0) (starts-with# (string-ith (first dict) 0) dict)) (count-by-letter (rest dict))))]
     ))
 
-
-;(check-expect (count-by-letter '()) '())
-;(check-expect (count-by-letter (list "z")) (list (list "z" 1)))
-;(check-expect (count-by-letter (list "a" "b")) (list (list "a" 1) (list "b" 1)))
-;(check-expect (count-by-letter (list "a" "aa" "b")) (list (list "a" 2) (list "b" 1)))
-
-
-
+; (check-expect (count-by-letter (list "a" "b" "c" "ab" "bc" "abc" "bca" "cba")))
+; (string-ith (first dict) 0)
 
