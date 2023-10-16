@@ -1,0 +1,139 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.2-real-world-data-itunes) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "itunes.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "itunes.rkt" "teachpack" "2htdp")) #f)))
+; 12.2 Real-World Data: iTunes
+ 
+; An LTracks is one of:
+; – '()
+; – (cons Track LTracks)
+
+(define ITUNES-LOCATION "itunes-summarized.xml")
+ 
+; LTracks
+(define itunes-tracks
+  (read-itunes-as-tracks ITUNES-LOCATION))
+
+; Ex 199
+
+(define LINUX-EPOCH (create-date 1970 1 1 0 0 0))
+(define TODAY (create-date 2023 10 16 9 15 34))
+(define SOMEDAY (create-date 2022 1 22 23 02 17))
+(define TIME (create-track "Time" "Pink Floyd" "The Dark Side of the Moon" 413000 4 SOMEDAY 27 TODAY))
+(define MONEY (create-track "Money" "Pink Floyd" "The Dark Side of the Moon" 382000 6 SOMEDAY 19 TODAY))
+(define SELFLESS (create-track "Selfless" "The New Abnormal" "The Strokes" 222000 3 SOMEDAY 34 TODAY))
+(define LTRACKS (list TIME MONEY SELFLESS))
+
+; Ex 200
+
+; LTracks -> Number
+; consumes an element of LTracks and computes the total play time of it
+(define (total-time ltracks)
+  (cond
+    [(empty? ltracks) 0]
+    [else (+ (track-time (first ltracks)) (total-time (rest ltracks)))]))
+
+(check-expect (total-time LTRACKS) (+ 413000 382000 222000))
+
+; Ex 201
+; LTracks -> List-of-strings
+(define (select-all-album-titles ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [else (cons (track-name (first ltracks)) (select-all-album-titles (rest ltracks)))]))
+
+(check-expect (select-all-album-titles LTRACKS) (list "Time" "Money" "Selfless"))
+
+; List-of-string -> List-of-strings
+; constructs a List-of-string that contains every String from the given list, exactly once
+(define (create-set los)
+  (cond
+    [(empty? los) '()]
+    [else (if (member? (first los) (rest los))
+              (create-set (rest los))
+              (cons (first los) (create-set (rest los))))]))
+
+(check-expect (create-set (list "well" "hello" "there")) (list "well" "hello" "there"))
+(check-expect (create-set (list "well" "hello" "there" "hello")) (list "well" "there" "hello"))
+
+; LTracks -> List-of-strings
+; produce a list of unique album titles
+(define (select-album-titles/unique ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [else (if (member? (first ltracks) (rest ltracks))
+              (select-album-titles/unique (rest ltracks))
+              (cons (first ltracks) (select-album-titles/unique (rest ltracks))))]))
+
+(check-expect (select-album-titles/unique LTRACKS) LTRACKS)
+(check-expect (select-album-titles/unique (list TIME SELFLESS TIME MONEY TIME MONEY)) (list SELFLESS TIME MONEY))
+
+;; Ex 202
+
+; String LTracks -> List-of-strings
+; Given an album title, it extracts from an LTracks a list of its tracks
+(define (select-album title ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [else (if (string=? title (track-album (first ltracks)))
+              (cons (first ltracks) (select-album title (rest ltracks)))
+              (select-album title (rest ltracks)))]))
+
+(check-expect (select-album "A Day Without Rain" itunes-tracks) (list
+                                                                 (create-track
+                                                                  "Wild Child"
+                                                                  "Enya"
+                                                                  "A Day Without Rain"
+                                                                  227996
+                                                                  2
+                                                                  (create-date 2002 7 17 3 55 14)
+                                                                  20
+                                                                  (create-date 2011 5 17 17 35 13))
+                                                                 (create-track
+                                                                  "Only Time"
+                                                                  "Enya"
+                                                                  "A Day Without Rain"
+                                                                  218096
+                                                                  3
+                                                                  (create-date 2002 7 17 3 55 42)
+                                                                  18
+                                                                  (create-date 2011 5 17 17 38 47))
+                                                                 (create-track
+                                                                  "Tempus Vernum"
+                                                                  "Enya"
+                                                                  "A Day Without Rain"
+                                                                  144326
+                                                                  4
+                                                                  (create-date 2002 7 17 3 56 33)
+                                                                  19
+                                                                  (create-date 2011 5 17 17 41 6))))
+
+; String Date LTracks
+; extracts the list of tracks that belong to the given album and have been played after the given date
+(define (select-album-date title date ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [else (if (date<? date (track-played (first ltracks)))
+              (cons (first ltracks) (select-album-date title date (rest ltracks)))
+              (select-album-date title date (rest ltracks)))]))
+
+; (check-expect (select-album-date "A Day Without Rain" TODAY itunes-tracks) ...)
+
+; Date Date -> Boolean
+; determine whether the first date occurs before the second
+(define (date<? d1 d2)
+  (cond
+    [(and
+      (< (date-year d1) (date-year d2))
+      (< (date-month d1) (date-month d2))
+      (< (date-day d1) (date-day d2))
+      (< (date-hour d1) (date-hour d2))
+      (< (date-minute d1) (date-hour d2))
+      (< (date-second d1) (date-second d2))
+      ) #true]
+    [else #false]))
+    
+
+(check-expect (date<? LINUX-EPOCH TODAY) #true)
+(check-expect (date<? TODAY SOMEDAY) #false)
+
+

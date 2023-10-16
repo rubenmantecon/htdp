@@ -34,21 +34,17 @@
 ; Dictionary -> List-of-Letter-Counts
 ; counts how often a word in a dictionary starts with each letter of the alphabet
 (define (count-by-letter* dict)
-  (cond
-    [(empty? dict) '()]
-    [else ;(if (string=? (string-ith (first dict) 0) (string-ith (second dict) 0))
-              (cons
-               (list (string-ith (first dict) 0) (starts-with# (string-ith (first dict) 0) dict))
-               (count-by-letter* (rest dict)))
-             ; (count-by-letter* (rest dict))
-             ; )
-          ]))
+  (count-by-letter LETTERS dict))
 
-(check-expect (count-by-letter* '()) '())
-(check-expect (count-by-letter* (list "z")) (list "z" 1))
-(check-expect (count-by-letter* (list "z" "zazz")) (list (list "z" 2)))
-(check-expect (count-by-letter* (list "a" "b")) (list (list "a" 1) (list "b" 1)))
-(check-expect (count-by-letter* (list "a" "aa" "b")) (list (list "a" 2) (list "b" 1)))
+; List-of-strings Dictionary -> List-of-LetterCounts
+; counts, for a dictionary, how many letters there are
+(define (count-by-letter letters dict)
+  (cond
+    [(empty? letters) '()]
+    [else (cons (list (first letters) (starts-with# (first letters) dict))
+                (count-by-letter (rest letters) dict))]))
+
+
 
 
 
