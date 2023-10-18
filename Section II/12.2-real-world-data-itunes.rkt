@@ -39,9 +39,12 @@
 (define (select-all-album-titles ltracks)
   (cond
     [(empty? ltracks) '()]
-    [else (cons (track-name (first ltracks)) (select-all-album-titles (rest ltracks)))]))
+    [else (cons (track-album (first ltracks)) (select-all-album-titles (rest ltracks)))]))
 
-(check-expect (select-all-album-titles LTRACKS) (list "Time" "Money" "Selfless"))
+(check-expect (select-all-album-titles LTRACKS) (list
+                                                 "The Dark Side of the Moon"
+                                                 "The Dark Side of the Moon"
+                                                 "The Strokes"))
 
 ; List-of-string -> List-of-strings
 ; constructs a List-of-string that contains every String from the given list, exactly once
@@ -107,6 +110,8 @@
                                                                   19
                                                                   (create-date 2011 5 17 17 41 6))))
 
+;; Ex 203
+
 ; String Date LTracks
 ; extracts the list of tracks that belong to the given album and have been played after the given date
 (define (select-album-date title date ltracks)
@@ -116,7 +121,35 @@
               (cons (first ltracks) (select-album-date title date (rest ltracks)))
               (select-album-date title date (rest ltracks)))]))
 
-; (check-expect (select-album-date "A Day Without Rain" TODAY itunes-tracks) ...)
+(check-expect (select-album-date "A Day Without Rain" TODAY itunes-tracks) '())
+(check-expect (select-album-date "A Day Without Rain" LINUX-EPOCH itunes-tracks) (list
+                                                                                  (create-track
+                                                                                   "Wild Child"
+                                                                                   "Enya"
+                                                                                   "A Day Without Rain"
+                                                                                   227996
+                                                                                   2
+                                                                                   (create-date 2002 7 17 3 55 14)
+                                                                                   20
+                                                                                   (create-date 2011 5 17 17 35 13))
+                                                                                  (create-track
+                                                                                   "Only Time"
+                                                                                   "Enya"
+                                                                                   "A Day Without Rain"
+                                                                                   218096
+                                                                                   3
+                                                                                   (create-date 2002 7 17 3 55 42)
+                                                                                   18
+                                                                                   (create-date 2011 5 17 17 38 47))
+                                                                                  (create-track
+                                                                                   "Tempus Vernum"
+                                                                                   "Enya"
+                                                                                   "A Day Without Rain"
+                                                                                   144326
+                                                                                   4
+                                                                                   (create-date 2002 7 17 3 56 33)
+                                                                                   19
+                                                                                   (create-date 2011 5 17 17 41 6))))
 
 ; Date Date -> Boolean
 ; determine whether the first date occurs before the second
@@ -135,5 +168,24 @@
 
 (check-expect (date<? LINUX-EPOCH TODAY) #true)
 (check-expect (date<? TODAY SOMEDAY) #false)
+
+;; Ex 204
+
+; LTracks -> List-of-LTracks
+; produces a list of LTracks, one per album
+(define (select-albums* ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [else (select-albums (select-all-album-titles ltracks) ltracks)]))
+
+; List-of-strings LTracks -> LTracks
+; takes a list of album titles, a list of tracks, and produces a list of LTracks, one list per album
+(define (select-albums los ltracks)
+  (cond
+    [(empty? ltracks) '()]
+    [(empty? los) '()]
+    [else (if (string=? (first los) (track-album (first ltracks)))
+              (cons (first ltracks) (select-albums los (rest ltracks)))
+              (select-albums los (rest ltracks)))]))
 
 
