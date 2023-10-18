@@ -13,6 +13,10 @@
 (define itunes-tracks
   (read-itunes-as-tracks ITUNES-LOCATION))
 
+; LLists
+(define itunes-lists
+  (read-itunes-as-lists ITUNES-LOCATION))
+
 ; Ex 199
 
 (define LINUX-EPOCH (create-date 1970 1 1 0 0 0))
@@ -186,6 +190,112 @@
     [(empty? los) '()]
     [else (if (string=? (first los) (track-album (first ltracks)))
               (cons (first ltracks) (select-albums los (rest ltracks)))
-              (select-albums los (rest ltracks)))]))
+              (select-albums (rest los) ltracks))]))
+;;(define-struct track
+;;  [name artist album time track# added play# played])
 
+;; Ex 205
+(define LASSOC1 (list
+                 (list "Name" "Song 1")
+                 (list "Artist" "Artist 1")
+                 (list "Album" "Album 1 from Artist 1")
+                 (list "Total Time" 589000)
+                 (list "Track#" 1)
+                 (list "Added" (create-date 2022 7 12 9 12 16))
+                 (list "Play#" 13)
+                 (list "Played" (create-date 2023 1 1 23 59 59))
+                 (list "Favorite?" #true)))
 
+(define LASSOC2 (list
+                 (list "Name" "Song 2")
+                 (list "Artist" "Artist 1")
+                 (list "Album" "Album 1 from Artist 1")
+                 (list "Total Time" 288000)
+                 (list "Track#" 2)
+                 (list "Added" (create-date 2022 7 12 9 12 16))
+                 (list "Play#" 9)
+                 (list "Played" (create-date 2023 1 2 12 13 37))
+                 (list "Favorite?" #false)))
+
+(define LASSOC3 '(("Name" "Song 9")
+                  ("Artist" "Artist 2")
+                  ("Album" "Album 1 from Artist 2")
+                  ("Total Time" 367000)
+                  ("Track" 9)
+                  ("Added" (create-date 2021 9 23 15 2 34))
+                  ("Play#" 28)
+                  ("Played" (create-date 2022 6 19 20 14 1))
+                  ("Starred?" #false)
+                  ))
+
+(define LASSOC4 '(("Name" "Song 10")
+                  ("Artist" "Artist 2")
+                  ("Album" "Album 1 from Artist 2")
+                  ("Total Time" 987000)
+                  ("Track" 10)
+                  ("Added" (create-date 2021 9 23 15 2 34))
+                  ("Play#" 28)
+                  ("Played" (create-date 2022 6 20 21 14 14))
+                  ("Starred?" #true)
+                  ))
+
+(define LLISTS1 (list LASSOC1 LASSOC2))
+(define LLISTS2 (list LASSOC3 LASSOC4))
+(define LLISTS3 (list LASSOC1 LASSOC2 LASSOC3 LASSOC4))
+
+;; Ex 206
+
+; String LAssoc Any -> AssociationOrAny
+; produces the first Association from LAssoc whose first item is String, or produces Any
+(define (find-association key lassoc default)
+  (cond
+    [(empty? lassoc) default]
+    [else (if (string=? key (first (first lassoc)))
+              (first lassoc)
+              (find-association key (rest lassoc) default))]))
+
+(check-expect (find-association "Track" '() "Not found") "Not found")
+(check-expect (find-association "Name" LASSOC4 #false) '("Name" "Song 10"))
+(check-expect (find-association "neim" LASSOC4 #false) #false)
+(check-expect (find-association "Track" LASSOC4 "Not found") '("Track" 10))
+(check-expect (find-association "track" LASSOC4 "Not found") "Not found")
+
+;; Ex 207
+
+; LLists -> Number
+; produce the total play time for a list of albums
+(define (total-time/lists llists)
+  (cond
+    [(empty? llists) 0]
+    [else  (+ (second (assoc "Total Time" (first llists))) (total-time/lists (rest llists)))]))
+
+(check-expect (total-time/lists LLISTS1) (+ 589000 288000) )
+(check-expect (total-time/lists LLISTS3) (+ 589000 288000 367000 987000))
+
+;; Ex 208
+
+; LLists -> List-of-strings
+; produce a list of unique strings that contain that are associated with a Boolean attribute
+(define (boolean-attributes llists)
+  (cond
+    [(empty? llists) '()]
+    [else  (create-set (cons (first (boolean-attributes/inner (first llists))) (boolean-attributes (rest llists))))]))
+
+(check-expect (boolean-attributes LLISTS1) '("Favorite?"))
+(check-expect (boolean-attributes LLISTS2) '("Starred?"))
+(check-expect (boolean-attributes LLISTS3) '("Favorite?" "Starred?"))
+
+; LAssoc -> List-of-strings
+; produce a list of strings that contain that are associated with a Boolean attribute
+(define (boolean-attributes/inner lassoc)
+  (cond
+    [(empty? lassoc) '()]
+    [else (if (boolean? (second (first lassoc)))
+              (cons (first (first lassoc)) (cons (second (first lassoc)) (boolean-attributes/inner (rest lassoc))))
+              (boolean-attributes/inner (rest lassoc)))]))
+
+(check-expect (boolean-attributes/inner LASSOC1) '("Favorite?" #true))
+
+; LAssoc -> Track
+; Convert an LAssoc to Track when possible
+(define (track-as-struct track lassoc) '())
