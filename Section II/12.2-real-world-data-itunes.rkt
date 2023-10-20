@@ -295,7 +295,3 @@
               (boolean-attributes/inner (rest lassoc)))]))
 
 (check-expect (boolean-attributes/inner LASSOC1) '("Favorite?" #true))
-
-; LAssoc -> Track
-; Convert an LAssoc to Track when possible
-(define (track-as-struct track lassoc) '())
