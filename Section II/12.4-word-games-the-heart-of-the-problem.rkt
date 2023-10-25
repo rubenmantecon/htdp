@@ -14,9 +14,6 @@
     [else (insert-everywhere/in-all-words (first w)
                                           (arrangements (rest w)))]))
 
-;(check-expect (arrangements '("a")) '("a"))
-;(check-expect (arrangements '("o" "h")) '(("o" "h") ("h" "o")))
-
 ;; Ex 212
 
 (define WORD1 '("a"))
@@ -42,26 +39,21 @@
     [(empty? low) '()]
     [else (cons (insert-everywhere/word s (first low)) (insert-everywhere/in-all-words s (rest low)))]))
 
-(check-expect (insert-everywhere/in-all-words "a" '()) '())
+(check-expect (insert-everywhere/in-all-words "a" '()) (list
+                                                        (list "a")))
 (check-expect (insert-everywhere/in-all-words "a" (list (list "b"))) (list
                                                                       (list "a" "b")
                                                                       (list "b" "a")))
 
 
 
-; 1String Word -> List-of-Words
-; appends and prepends 1String to Word, producing a list of words
+; 1String Word -> Word
+; inserts the 1String in all possible positions of a Word
 (define (insert-everywhere/word s w)
   (cond
-    [(empty? w) '()]
-    [else (cons ... ) (insert-everywhere/word s (rest w)))]))
+    [(empty? w) (list s)]
+    [else (cons s (cons (first w) (insert-everywhere/word s (rest w))))]))
 
-(check-expect (insert-everywhere/word "x" '()) '())
-(check-expect (insert-everywhere/word "x" (list "a")) (list
-                                                       (list "a" "x")
-                                                       (list "x" "a")))
-(check-expect (insert-everywhere/word "x" (list "a" "b")) (list
-                                                          (list "a" "b" "x")
-                                                          (list "a" "x" "b")
-                                                          (list "x" "a" "b")))
-
+(check-expect (insert-everywhere/word "x" '()) (list "x"))
+(check-expect (insert-everywhere/word "x" (list "a")) (list "x" "a" "x"))
+(check-expect (insert-everywhere/word "x" (list "a" "b")) (list "x" "a" "x" "b" "x"))
