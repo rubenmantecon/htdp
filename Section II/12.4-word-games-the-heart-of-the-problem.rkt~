@@ -17,22 +17,6 @@
 ;(check-expect (arrangements '("a")) '("a"))
 ;(check-expect (arrangements '("o" "h")) '(("o" "h") ("h" "o")))
 
-;; Ex 212
-
-(define WORD1 '("a"))
-(define WORD2 '("o" "h"))
-(define WORD3 '("t" "i" "e"))
-(define WORD4 '("b" "a" "r" "k"))
-
-(define LWORD1 (list WORD1))
-(define LWORD2 '(WORD1 WORD2))
-(define LWORD3 '(WORD1 WORD2 WORD3))
-(define LWORD4 '(WORD1 WORD2 WORD3 WORD4))
-
-(check-expect (arrangements WORD1) '(("a")))
-(check-expect (arrangements WORD2) '(("o" "h") ("h" "o")))
-
-
 ;; Ex 213
 
 ; 1String List-of-Words -> List-of-Words
