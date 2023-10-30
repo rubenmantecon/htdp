@@ -15,3 +15,34 @@
 (define LETTERS
   (explode "abcdefghijklmnopqrstuvwxyz"))
 
+; Letter Dictionary -> Number
+; counts how many words in Dictionary start with Letter
+(define (starts-with# letter dict)
+  (cond
+    [(empty? dict) 0]
+    [else (if (string=? (string-ith (first dict) 0) letter)
+              (+ (starts-with# letter (rest dict)) 1)
+              (starts-with# letter (rest dict)))
+          ]))
+
+(check-expect (starts-with# "z" AS-LIST) 30)
+
+; A LetterCount is any of:
+; - '()
+; (list String Number LetterCount)
+
+; Dictionary -> List-of-Letter-Counts
+; counts how often a word in a dictionary starts with each letter of the alphabet
+(define (count-by-letter* dict)
+  (count-by-letter LETTERS dict))
+
+; List-of-strings Dictionary -> List-of-LetterCounts
+; counts, for a dictionary, how many letters there are
+(define (count-by-letter letters dict)
+  (cond
+    [(empty? letters) '()]
+    [else (cons (list (first letters) (starts-with# (first letters) dict))
+                (count-by-letter (rest letters) dict))]))
+
+
+
