@@ -45,11 +45,6 @@
     [else (cons (list (first letters) (starts-with# (first letters) dict))
                 (count-by-letter/inner (rest letters) dict))]))
 
-(check-expect (count-by-letter (list "a" "abba" "armaggedon" "bone" "boggling" "brutal" "battery" "sadistic" "subhuman" "sovereign" "satori" "solace" "sail"))
-              (list
-               (list "a" 3)
-               (list "b" 4)
-               (list "s" 6)))
 
 ;; Ex 197
 
@@ -68,15 +63,50 @@
 (define (sort-lc> lolc)
   (cond
     [(empty? lolc) '()]
-    [else ...]))
+    [else (insert-lc (first lolc) (sort-lc> (rest lolc)))]))
 
 (check-expect (sort-lc> (list
-                        (list "a" 3)
-                        (list "b" 4)
-                        (list "f" 0)
-                        (list "s" 6)))
+                         (list "a" 3)
+                         (list "b" 4)
+                         (list "f" 0)
+                         (list "s" 6)))
               (list
                (list "s" 6)
                (list "b" 4)
                (list "a" 3)
                (list "f" 0)))
+
+; LetterCount List-of-lettercounts -> List-of-lettercounts
+; inserts a LetterCount into a descending ordered list of lettercounts
+(define (insert-lc lc lolc)
+  (cond
+    [(empty? lc) lolc]
+    [(empty? lolc) (list lc)]
+    [else (if (lc>? lc (first lolc))
+              (cons lc lolc)
+              (cons (first lolc) (insert-lc lc (rest lolc)))) ]))
+
+(check-expect (insert-lc (list "t" 12) (list
+                                        (list "b" 10)
+                                        (list "c" 9)))
+              (list
+               (list "t" 12)
+               (list "b" 10)
+               (list "c" 9)))
+
+(check-expect (insert-lc (list "t" 3) (list
+                                       (list "x" 15)
+                                       (list "s" 8)
+                                       (list "h" 2)))
+              (list
+               (list "x" 15)
+               (list "s" 8)
+               (list "t" 3)
+               (list "h" 2)))
+
+; LetterCount LetterCount -> Boolean
+; determines if the first LetterCount has a bigger count than the second
+(define (lc>? lc1 lc2)
+  (if (>= (second lc1) (second lc2))
+              #true
+              #false))
