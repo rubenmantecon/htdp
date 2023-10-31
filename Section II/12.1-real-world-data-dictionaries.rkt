@@ -110,3 +110,20 @@
   (if (>= (second lc1) (second lc2))
               #true
               #false))
+
+;; Ex 198
+
+; Dictionary -> List-of-dictionaries
+; produce a list of dictionaries, one Dictionary per Letter
+(define (words-by-first-letter dict)
+  (cond
+    [(empty? (rest dict)) (first dict)]
+    [else ...]))
+
+
+
+(check-expect (words-by-first-letter (list "a" "abba" "armaggedon" "bone" "boggling" "brutal" "battery" "sadistic" "subhuman" "sovereign" "satori" "solace" "sail"))
+              (list
+               (list "a" "abba" "armageddon")
+               (list "bone" "boggling" "brutal" "battery")
+               (list "sadistic" "subhuman" "sovereign" "satori" "solace" "sail")))
