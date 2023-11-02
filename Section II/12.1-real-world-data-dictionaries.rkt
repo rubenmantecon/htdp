@@ -49,7 +49,7 @@
 ;; Ex 197
 
 ; Dictionary -> LetterCount
-; gets a list of lettercounts from a dictionary, and takes the LetterCount with the highest number
+; return the LetterCount with the highest number of occurrences
 (define (most-frequent dict)
   (cond
     [(empty? dict) '()]
@@ -108,22 +108,38 @@
 ; determines if the first LetterCount has a bigger count than the second
 (define (lc>? lc1 lc2)
   (if (>= (second lc1) (second lc2))
-              #true
-              #false))
+      #true
+      #false))
 
 ;; Ex 198
 
 ; Dictionary -> List-of-dictionaries
 ; produce a list of dictionaries, one Dictionary per Letter
 (define (words-by-first-letter dict)
+  (words-by-first-letter/outer LETTERS dict))
+
+; List-of-strings Dictionary -> List-of-dictionaries
+; produce a list of dictionaries, one Dictionary per Letter
+(define (words-by-first-letter/outer letters dict)
   (cond
-    [(empty? (rest dict)) (first dict)]
-    [else ...]))
+    [(empty? dict) '()]
+    [(empty? letters) '()]
+    [else (cons (words-by-first-letter/inner (first letters) dict) (words-by-first-letter/outer (rest letters) dict))]))
 
+;(check-expect (words-by-first-letter (list "a" "abba" "armaggedon" "bone" "boggling" "brutal" "battery" "sadistic" "subhuman" "sovereign" "satori" "solace" "sail"))
+;              (list
+;               (list "a" "abba" "armageddon")
+;               (list "bone" "boggling" "brutal" "battery")
+;               (list "sadistic" "subhuman" "sovereign" "satori" "solace" "sail"
+;                     )))
 
+; List-of-letters Dictionary -> Dictionary
+; produce from a dictionary, a dictionary whose words start by Letter
+(define (words-by-first-letter/inner letter dict)
+  (cond
+    [(empty? dict) '()]
+    [else (if (string=? (substring (first dict) 0 1) letter)
+              (cons (first dict) (words-by-first-letter/inner letter (rest dict)))
+              (words-by-first-letter/inner letter (rest dict)))]))
 
-(check-expect (words-by-first-letter (list "a" "abba" "armaggedon" "bone" "boggling" "brutal" "battery" "sadistic" "subhuman" "sovereign" "satori" "solace" "sail"))
-              (list
-               (list "a" "abba" "armageddon")
-               (list "bone" "boggling" "brutal" "battery")
-               (list "sadistic" "subhuman" "sovereign" "satori" "solace" "sail")))
+(define (most-frequent.v2 dict)'())
