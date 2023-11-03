@@ -23,8 +23,8 @@
     [(empty? dict) 0]
     [else (if (string=? (string-ith (first dict) 0) letter)
               (+ (starts-with# letter (rest dict)) 1)
-              (starts-with# letter (rest dict)))
-          ]))
+              (starts-with# letter (rest dict)))]))
+          
 
 (check-expect (starts-with# "z" AS-LIST) 30)
 
@@ -53,7 +53,7 @@
 (define (most-frequent dict)
   (cond
     [(empty? dict) '()]
-    [else  (first (sort-lc> (count-by-letter dict))) ]))
+    [else  (first (sort-lc> (count-by-letter dict)))]))
 
 (check-expect (most-frequent '()) '())
 (check-expect (most-frequent (list "a" "abba" "armaggedon" "bone" "boggling" "brutal" "battery" "sadistic" "subhuman" "sovereign" "satori" "solace" "sail")) (list "s" 6))
@@ -84,7 +84,7 @@
     [(empty? lolc) (list lc)]
     [else (if (lc>? lc (first lolc))
               (cons lc lolc)
-              (cons (first lolc) (insert-lc lc (rest lolc)))) ]))
+              (cons (first lolc) (insert-lc lc (rest lolc))))]))
 
 (check-expect (insert-lc (list "t" 12) (list
                                         (list "b" 10)
@@ -142,4 +142,32 @@
               (cons (first dict) (words-by-first-letter/inner letter (rest dict)))
               (words-by-first-letter/inner letter (rest dict)))]))
 
-(define (most-frequent.v2 dict)'())
+(define (most-frequent.v2 dict)
+  (cond
+    [(empty? dict) '()]
+    [else (... (trim-empty-dictionaries (words-by-first-letter dict)))]))
+
+(check-expect (most-frequent.v2 AS-LIST) (most-frequent AS-LIST))
+
+; List-of-dictionaries -> List-of-dictionaries
+; remove empty dictionaries from a list of dictionaries
+(define (trim-empty-dictionaries ldict)
+  (cond
+   [(empty? ldict) '()]
+   [else (if (or (empty? (first (first ldict))) (empty? (second (first ldict))))
+          (trim-empty-dictionaries (rest ldict))
+          (cons (first ldict) (trim-empty-dictionaries (rest ldict))))]))
+              
+
+(check-expect (trim-empty-dictionaries (list
+                                        (list "a" "abba")
+                                        (list '())
+                                        (list "b" "brutal")
+                                        (list '())
+                                        (list "h" "heyo" "howdy"))) (list
+                                                                     (list "a" "abba")
+                                                                     (list "b" "brutal")
+                                                                     (list "h" "heyo" "howdy"))) 
+
+;; To be brutally honest, I grew tired of trying to adapt a template for a list of dictionaries. I believe I see the point.
+  

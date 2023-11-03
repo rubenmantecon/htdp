@@ -28,12 +28,6 @@
 (define LWORD3 '(WORD1 WORD2 WORD3))
 (define LWORD4 '(WORD1 WORD2 WORD3 WORD4))
 
-
-
-
-;; Ex 213
-
-; 1String List-of-Words -> List-of-Words
 ; inserts the 1String in all possible positions of the list of words
 (define (insert-everywhere/in-all-words s low)
   (cond
