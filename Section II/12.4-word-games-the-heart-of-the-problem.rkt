@@ -8,7 +8,7 @@
 ; – (cons 1String Word)
 ; interpretation a Word is a list of 1Strings (letters)
 
-; List-of-words -> List-of-words
+; Word -> List-of-words
 ; produces a list of all the possible arrangements a word can have
 (define (arrangements w)
   (cond
@@ -28,6 +28,9 @@
 (define LWORD3 '(WORD1 WORD2 WORD3))
 (define LWORD4 '(WORD1 WORD2 WORD3 WORD4))
 
+;; Ex 213
+
+; 1String List-of-words -> List-of-words
 ; inserts the 1String in all possible positions of the list of words
 (define (insert-everywhere/in-all-words s low)
   (cond
@@ -44,3 +47,5 @@
 (check-expect (insert-everywhere/word "x" '()) (list "x"))
 (check-expect (insert-everywhere/word "x" (list "a")) (list "x" "a" "x"))
 (check-expect (insert-everywhere/word "x" (list "a" "b")) (list "x" "a" "x" "b" "x"))
+
+;; Section unfinished because I'm not sure I understand the problem. Leaving for now, jumping into next one.
