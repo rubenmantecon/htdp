@@ -1,38 +1,39 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.5-feeding-worms) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
-
 ;; Ex 215
 
 ;; Constants
-(define PIECE (circle 2 "solid" "red")) 
+(define DIAMETER 2)
+(define PIECE (circle DIAMETER "solid" "red")) 
 (define BACKGROUND (empty-scene 120 80))
 
 ;; Data definitions
 
-; A Worm is a Posn:
-; (make-posn Number Number)
-; interpretation: the location of the Worm in space
+; A WorldState is a Posn
+; interpretation the location of the worm at each moment in time
 
 ;; World functions
 
-; Worm -> Image
-; based on the data available, renders the equivalent picture of it
-(define (render worm) (place-image PIECE (posn-x worm) (posn-y worm) BACKGROUND))
+; WorldState -> Image 
+; renders the worm based on the current WorldState (Posn)
+(define (render cw) (place-image PIECE (posn-x cw) (posn-y cw) BACKGROUND))
 
-; Worm -> Worm  
+; WorldState -> WorldState  
 ; updates the state of the world after each CPU clock tick
-(define (clock-tick-handler worm)
- '()) 
+(define (tock cw)
+ (make-posn (+ (posn-x cw) DIAMETER) (+ (posn-y cw) DIAMETER)))
+ 
 
 ; KeyEvent Worm -> Worm
 ; updates the state of the worm upon a KeyEvent
-(define (key-event-handler ke worm)
+(define (ke-h cw ke)
  (cond
-  [(key=? ke "up") (make-posn (posn-x worm) (add1 (posn-y worm)))]
-  [(key=?  ke "down") (make-posn (posn-x worm) (sub1 (posn-y worm)))]
-  [(key=? ke "left") (make-posn (sub1 (posn-x worm)) (posn-y worm))]
-  [(key=? ke "right" ) (make-posn (add1 (posn-x worm)) (posn-y worm))]))
+  [(key=? ke "up") (make-posn (posn-x cw)  (- (posn-y cw) DIAMETER))]
+  [(key=?  ke "down") (make-posn (posn-x cw) (+ (posn-y cw) DIAMETER))]
+  [(key=? ke "left") (make-posn (- (posn-x cw) DIAMETER) (posn-y cw))]
+  [(key=? ke "right" ) (make-posn (+ (posn-x cw) DIAMETER) (posn-y cw))]
+  [else cw]))
   
 
 ;; WorldState -> Boolean
@@ -41,6 +42,7 @@
 
 (define (main world)
  (big-bang world
-  [on-key key-event-handler]
+  [on-key ke-h]
+  [on-tick tock 1]
   [on-draw render]))
   
