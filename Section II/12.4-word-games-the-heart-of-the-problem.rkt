@@ -1,5 +1,4 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
+;; about the language level of this file in a form that our tools can easiy process.
 #reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.4-word-games-the-heart-of-the-problem) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
 ;; 12.4 Word Games, the Heart of the Problem
 
@@ -8,7 +7,7 @@
 ; – (cons 1String Word)
 ; interpretation a Word is a list of 1Strings (letters)
 
-; List-of-words -> List-of-words
+; List-of-words ->  List-of-list-of-words
 ; produces a list of all the possible arrangements a word can have
 (define (arrangements w)
   (cond
@@ -28,11 +27,19 @@
 (define LWORD3 '(WORD1 WORD2 WORD3))
 (define LWORD4 '(WORD1 WORD2 WORD3 WORD4))
 
-; inserts the 1String in all possible positions of the list of words
+; 1String List-of-words -> List-of-list-of-words
+; inserts the 1string in all possible positions of the list of words
 (define (insert-everywhere/in-all-words s low)
   (cond
     [(empty? low) '()]
-    [else (cons (insert-everywhere/word s (first low)) (insert-everywhere/in-all-words s (rest low)))]))
+    [else ( list (append (insert-everywhere/word s (list (first low) )) (insert-everywhere/word s (rest low))
+                ; (insert-everywhere/in-all-words s (rest low))
+                ) )]))
+
+
+(check-expect (insert-everywhere/in-all-words "x" (list "a" "b"))
+              (list
+                (list "x" "a" "x" "b" "x")))
 
 ; 1String Word -> Word
 ; inserts the 1String in all possible positions of a Word
