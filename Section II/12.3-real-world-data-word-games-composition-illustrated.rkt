@@ -47,7 +47,6 @@
 
 ;; Ex 211
 
-
 ; List-of-strings -> List-of-strings
 ; picks out all the Strings that occur in the dictionary 
 (define (in-dictionary los)

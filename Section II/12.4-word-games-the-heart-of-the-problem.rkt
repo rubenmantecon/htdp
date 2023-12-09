@@ -51,3 +51,4 @@
 (check-expect (insert-everywhere/word "x" '()) (list "x"))
 (check-expect (insert-everywhere/word "x" (list "a")) (list "x" "a" "x"))
 (check-expect (insert-everywhere/word "x" (list "a" "b")) (list "x" "a" "x" "b" "x"))
+
