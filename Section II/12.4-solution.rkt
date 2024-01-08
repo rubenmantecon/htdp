@@ -1,8 +1,8 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname 12.4-solution) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.4-solution) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
 (require 2htdp/batch-io)
-(define LOCATION "words.txt")
+(define LOCATION "words-lite.txt")
 
 ; A Dictionary is a List-of-strings.
 (define DICTIONARY (read-lines LOCATION))
@@ -31,12 +31,24 @@
 ; Word -> List-of-words
 ; finds all rearrangements of word
 (check-expect (arrangements '()) (list '()))
-(check-expect (arrangemnts (list "d" "e")) (list (list "d" "e") (list "e" "d")))
+(check-expect (arrangements (list "d" "e")) (list (list "d" "e") (list "e" "d")))
 
 (define (arrangements w)
   (cond
     [(empty? w) (list '())]
     [else (insert-everywhere/in-all-words (first w) (arrangements (rest w)))]))
+
+; 1String List-of-words -> List-of-words
+; adds s on the front of each word in a list
+(check-expect (append-to-each-word "a" '()) '())
+(check-expect (append-to-each-word "a" (list (list "r" "e"))) (list (list "a" "r" "e")))
+(check-expect (append-to-each-word "a" (list (list "r" "e") (list "t" "e")))
+              (list (list "a" "r" "e") (list "a" "t" "e")))
+
+(define (append-to-each-word s low)
+  (cond
+    [(empty? low) '()]
+    [else (cons (cons s (first low)) (append-to-each-word s (rest low)))]))
 
 ; 1String List-of-words -> List-of-words
 ; Inserts s in every position in every word in the list of words
@@ -76,19 +88,7 @@
            ; words
            (append-to-each-word (first w) (insert-everywhere/in-one-word s (rest w))))]))
 
-(insert-everywhere/in-one-word "a" (list "d" "e"))
-
-; 1String List-of-words -> List-of-words
-; adds s on the front of each word in a list
-(check-expect (append-to-each-word "a" '()) '())
-(check-expect (append-to-each-word "a" (list (list "r" "e"))) (list (list "a" "r" "e")))
-(check-expect (append-to-each-word "a" (list (list "r" "e") (list "t" "e")))
-              (list (list "a" "r" "e") (list "a" "t" "e")))
-
-(define (append-to-each-word s low)
-  (cond
-    [(empty? low) '()]
-    [else (cons (cons s (first low)) (append-to-each-word s (rest low)))]))
+(insert-everywhere/in-one-word "a" (list "d" "e" "x"))
 
 ; String -> Word
 ; converts s to the chosen word representation
