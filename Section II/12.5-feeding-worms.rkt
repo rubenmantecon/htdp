@@ -58,17 +58,37 @@
     [(key=? "right" ke) (make-ww (make-posn (add1 (posn-x (ww-worm cw))) (posn-y (ww-worm cw))) ke)]
     [(key=? "left" ke) (make-ww (make-posn (sub1 (posn-x (ww-worm cw))) (posn-y (ww-worm cw))) ke)]
     [else cw]
-    
     ))
   
 
 ;; WorldState -> Boolean
 ;; evaluates, after each event, if the conditions to stop the program are satisifed
-;(define (end? world) '())
+(define (end? cw)
+  (if
+   (or
+    (or
+     (<= (posn-x (ww-worm cw)) 0)
+     (>= (posn-x (ww-worm cw)) WIDTH))
+    (or
+     (<= (posn-y (ww-worm cw)) 0)
+     (>= (posn-y (ww-worm cw)) HEIGHT)))
+   #true
+   #false))
+
+(define (render-end cw)
+  (place-images
+                   (list
+                    PIECE
+                    (text "worm hit border" 14 "red"))
+                   (list
+                    (make-posn (posn-x (ww-worm cw)) (posn-y (ww-worm cw)))
+                    (make-posn (/ WIDTH 2) (/ HEIGHT 2)))
+                   BACKGROUND))
 
 (define (main-worm cw)
  (big-bang cw
   [on-key ke-h]
   [on-tick tock 1]
-  [on-draw render]))
+  [on-draw render]
+  [stop-when end? render-end]))
   

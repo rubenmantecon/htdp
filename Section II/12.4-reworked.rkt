@@ -65,9 +65,3 @@
   (cond
     [(empty? low) '()]
     [else (cons (cons s (first low)) (prepend/word s (rest low)))]))
-
-(insert-everywhere/in-one-word "x" WORD0)
-(insert-everywhere/in-one-word "x" WORD1)
-(insert-everywhere/in-one-word "x" WORD2)
-(insert-everywhere/in-one-word "x" WORD3)
-(insert-everywhere/in-one-word "x" WORD4)
