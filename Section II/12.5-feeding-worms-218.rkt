@@ -1,11 +1,12 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.5-feeding-worms-217) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
-;; Ex 217
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname 12.5-feeding-worms-218) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
+;; Ex 218
 
 ;; Constants
 (define WIDTH 280)
 (define HEIGHT 80)
+(define MAX (* WIDTH HEIGHT))
 (define WWT-X 15)
 (define WWT-Y 30)
 (define WWT-DIR "down")
@@ -35,6 +36,24 @@
    (list (make-posn WWT-X WWT-Y) (make-posn (+ WWT-X 1) WWT-Y) (make-posn (+ WWT-X 2) WWT-Y) (make-posn (+ WWT-X 3) WWT-Y) (make-posn (+ WWT-X 4) WWT-Y))
    WWT-DIR))
 
+; Posn -> Posn 
+; ???
+(check-satisfied (food-create (make-posn 1 1)) not=-1-1?)
+(define (food-create p)
+  (food-check-create
+     p (make-posn (random MAX) (random MAX))))
+ 
+; Posn Posn -> Posn 
+; generative recursion 
+; ???
+(define (food-check-create p candidate)
+  (if (equal? p candidate) (food-create p) candidate))
+ 
+; Posn -> Boolean
+; use for testing only 
+(define (not=-1-1? p)
+  (not (and (= (posn-x p) 1) (= (posn-y p) 1))))
+
 ; WormState -> WormState
 ; produces the amount of pieces to render based on the amount of Posns 
 (define (pieces-to-render cw)
@@ -49,7 +68,6 @@
            (make-posn (posn-x (first (ww-worm cw))) (posn-y (first (ww-worm cw))))
            (move-tail (make-ww (rest (ww-worm cw)) (ww-direction cw))))]
     ))
-
 
 ;; World functions
 ; WormState -> Image 
@@ -85,7 +103,7 @@
     [(key=? (ww-direction cw) "up") (make-ww
                                      (append (list (make-posn (posn-x (first (ww-worm cw))) (sub1 (posn-y (first (ww-worm cw))))))
                                              (move-tail cw)) ke)]
-[(key=? (ww-direction cw) "down") (make-ww
+    [(key=? (ww-direction cw) "down") (make-ww
                                        (append (list (make-posn (posn-x (first (ww-worm cw))) (add1 (posn-y (first (ww-worm cw))))))
                                                (move-tail cw))
                                        ke)]
@@ -100,7 +118,7 @@
     ))
 
                                         
-  
+
 
 ;; WorldState -> Boolean
 ;; evaluates, after each event, if the conditions to stop the program are satisifed
