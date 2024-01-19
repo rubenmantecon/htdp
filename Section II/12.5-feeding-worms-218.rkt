@@ -140,7 +140,9 @@
   (place-images
    (append
     (pieces-to-render cw)
-    (list (text "worm hit border" 14 "red")))
+    (cond
+      [(member? (first (ww-worm cw)) (rest (ww-worm cw))) (list (text "worm hit itself" 14 "red"))]
+      [else (list (text "worm hit border" 14 "red"))]))
    (append
     (ww-worm cw)
     (list (make-posn (/ WIDTH 2) (/ HEIGHT 2))))
