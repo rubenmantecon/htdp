@@ -74,10 +74,11 @@
 (define (move-tail cw)
   (cond
     [(empty? (rest (ww-worm cw))) '()]
-    [(eq? (first (ww-worm cw)) (ww-food cw)) (cons
-                                              (ww-food cw) (move-tail (make-ww (ww-worm cw) (food-create (ww-food cw)) (ww-direction cw))))]
+    [(equal? (first (ww-worm cw)) (ww-food cw)) 
+                                                 
+                                                 (move-tail (make-ww (cons (ww-food cw)(rest (ww-worm cw))) (food-create (ww-food cw)) (ww-direction cw)))]
     [else (cons
-           (make-posn (posn-x (first (ww-worm cw))) (posn-y (first (ww-worm cw))))
+           (first (ww-worm cw))
            (move-tail (make-ww (rest (ww-worm cw)) (ww-food cw) (ww-direction cw))))]
     ))
 
