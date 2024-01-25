@@ -13,7 +13,7 @@
 (define DIAMETER 6)
 (define PIECE (circle DIAMETER "solid" "red"))
 (define BACKGROUND (empty-scene WIDTH HEIGHT))
-(define RATE 2)
+(define RATE 0.1)
 
 ;; Data definitions
 ;; A Worm-with-tails is either:
@@ -36,24 +36,6 @@
    (list (make-posn WWT-X WWT-Y) (make-posn (+ WWT-X 1) WWT-Y) (make-posn (+ WWT-X 2) WWT-Y) (make-posn (+ WWT-X 3) WWT-Y) (make-posn (+ WWT-X 4) WWT-Y))
    WWT-DIR))
 
-; Posn -> Posn 
-; ???
-(check-satisfied (food-create (make-posn 1 1)) not=-1-1?)
-(define (food-create p)
-  (food-check-create
-     p (make-posn (random MAX) (random MAX))))
- 
-; Posn Posn -> Posn 
-; generative recursion 
-; ???
-(define (food-check-create p candidate)
-  (if (equal? p candidate) (food-create p) candidate))
- 
-; Posn -> Boolean
-; use for testing only 
-(define (not=-1-1? p)
-  (not (and (= (posn-x p) 1) (= (posn-y p) 1))))
-
 ; WormState -> WormState
 ; produces the amount of pieces to render based on the amount of Posns 
 (define (pieces-to-render cw)
@@ -72,8 +54,19 @@
 ;; World functions
 ; WormState -> Image 
 ; renders the worm based on the current WormState
-; TODO don't overlap pieces
-(define (render cw) (place-images (pieces-to-render cw) (ww-worm cw) BACKGROUND))
+(define (render cw)
+  (draw-worm (ww-worm cw)))
+
+(define (draw-worm worm)
+  (cond
+    [(empty? worm) BACKGROUND]
+    [else (place-image/align
+           PIECE
+           (* DIAMETER (posn-x (first worm)))
+           (* DIAMETER (posn-y (first worm)))
+           "left" "top"
+           (draw-worm (rest worm))
+           )]))
 
 ; WorldState -> WorldState  
 ; updates the state of the world after each CPU clock tick
@@ -115,9 +108,7 @@
                                              (move-tail cw)) ke)]
     [else cw]
 
-    ))
-
-                                        
+    ))              
 
 
 ;; WorldState -> Boolean
@@ -148,10 +139,10 @@
     (list (make-posn (/ WIDTH 2) (/ HEIGHT 2))))
    BACKGROUND))
 
-(define (main-worm cw)
- (big-bang cw
+(define (main-worm rate)
+ (big-bang WWT1
   [on-key ke-h]
-  [on-tick tock 0.1]
+  [on-tick tock rate]
   [on-draw render]
   [stop-when end? render-end]
   [state #t]

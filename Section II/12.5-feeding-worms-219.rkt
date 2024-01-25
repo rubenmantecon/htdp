@@ -13,6 +13,7 @@
 (define WW-FOOD (make-posn (random WIDTH) (random HEIGHT)))
 (define DIAMETER 6)
 (define PIECE (circle DIAMETER "solid" "red"))
+(define FOOD-PIECE (circle DIAMETER "solid" "green"))
 (define BACKGROUND (empty-scene WIDTH HEIGHT))
 (define RATE 2)
 
@@ -74,9 +75,10 @@
 (define (move-tail cw)
   (cond
     [(empty? (rest (ww-worm cw))) '()]
-    [(equal? (first (ww-worm cw)) (ww-food cw)) 
-                                                 
-                                                 (move-tail (make-ww (cons (ww-food cw)(rest (ww-worm cw))) (food-create (ww-food cw)) (ww-direction cw)))]
+    [(equal? (first (ww-worm cw)) (ww-food cw)) (append
+                                                 (list (ww-food cw))
+                                                 (list (first (ww-worm cw)))
+                                                 (move-tail (make-ww (rest (ww-worm cw)) (food-create (ww-food cw)) (ww-direction cw)))) ]
     [else (cons
            (first (ww-worm cw))
            (move-tail (make-ww (rest (ww-worm cw)) (ww-food cw) (ww-direction cw))))]
@@ -87,11 +89,18 @@
 ; renders the current WormState
 ; TODO don't overlap pieces
 (define (render cw)
-    (place-images
-           (append (worm-pieces cw) (list PIECE))
-           (append (ww-worm cw) (list (ww-food cw)))
-           BACKGROUND)
-    )
+  (draw-worm (ww-worm cw)))
+
+(define (draw-worm worm)
+  (cond
+    [(empty? worm) BACKGROUND]
+    [else (place-image/align
+           PIECE
+           (* DIAMETER (posn-x (first worm)))
+           (* DIAMETER (posn-y (first worm)))
+           "left" "top"
+           (draw-worm (rest worm))
+           )]))
 
 ; WorldState -> WorldState  
 ; updates the state of the world after each CPU clock tick
@@ -178,11 +187,11 @@
     (list (make-posn (/ WIDTH 2) (/ HEIGHT 2))))
    BACKGROUND))
 
-(define (main-worm cw)
- (big-bang cw
+(define (main-worm speed)
+ (big-bang WW1
   [on-key ke-h]
-  [on-tick tock 0.1]
+  [on-tick tock speed]
   [on-draw render]
   [stop-when end? render-end]
-  [state #f]
+  [state #t]
   ))
