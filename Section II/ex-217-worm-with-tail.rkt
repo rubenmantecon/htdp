@@ -31,25 +31,62 @@
 ; A Worm World (WW) is a structure:
 (define-struct ww [worm direction])
 ; (make-ww NEList-of-Posn String)
-(define WW0 (make-ww (list (make-posn (/ HEIGHT 2) (/ WIDTH 2))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 1))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 2))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 3))) "up"))
-(define WW1 (make-ww (list (make-posn (/ HEIGHT 2) (/ WIDTH 2))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 1))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 2))
-                           (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 3))) "up"))
-(define WW2 (make-ww (list (make-posn (/ HEIGHT 2) (/ WIDTH 4))) "left"))
-(define WW3 (make-ww (list (make-posn (/ HEIGHT 2) (/ WIDTH 8))) "right"))
-(define WW4 (make-ww (list (make-posn (random HEIGHT) (random WIDTH))) (list-ref (list "up" "down" "left" "right") (random 3))))
-(define WW5 (make-ww (list (make-posn (random HEIGHT) (random WIDTH))) (list-ref (list "up" "down" "left" "right") (random 3))))
-(define WW6 (make-ww (list (make-posn (random HEIGHT) (random WIDTH))) (list-ref (list "up" "down" "left" "right") (random 3))))
+(define WW0 (make-ww (list
+                      (make-posn (/ HEIGHT 2) (/ WIDTH 2))
+                      (make-posn (+ (/ HEIGHT 2) DIAMETER) (/ WIDTH 2))
+                      ;(make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) DIAMETER))
+                      ;(make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) DIAMETER))
+                      )
+                     "up"))
+(define WW1 (make-ww (list
+                      (make-posn (/ HEIGHT 2) (/ WIDTH 2))
+                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 1))
+                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 2))
+                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 3)))
+                     "down"))
+(define WW2 (make-ww (list
+                      (make-posn (/ HEIGHT 2) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 1) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 2) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 3) (/ WIDTH 4)))
+                     "left"))
+(define WW3 (make-ww (list
+                      (make-posn (/ HEIGHT 2) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 1) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 2) (/ WIDTH 4))
+                      (make-posn (+ (/ HEIGHT 2) 3) (/ WIDTH 4)))
+                     "right"))
+(define WW4 (make-ww
+             (list (make-posn (random HEIGHT) (random WIDTH)))
+             (list-ref (list "up" "down" "left" "right") (random 3))))
+(define WW5 (make-ww
+             (list (make-posn (random HEIGHT) (random WIDTH)))
+             (list-ref (list "up" "down" "left" "right") (random 3))))
+(define WW6 (make-ww
+             (list (make-posn (random HEIGHT) (random WIDTH)))
+             (list-ref (list "up" "down" "left" "right") (random 3))))
 
 ; interpretation the total state of the world; the position of the worm and towards where is it moving at any point in time and space
 
 ;; Helper functions
-; WW Direction -> WW
-; moves the worm in
+; List-of-worms -> Image
+; recursively renders the worm
+(define (render-worm worm)
+  (cond
+    [(empty? worm) BACKGROUND]
+    [else (place-image/align
+           PIECE
+           (posn-x (first worm))
+           (posn-y (first worm))
+           "left" "top"
+           (render-worm (rest worm)))]))
+
+; NEList-of-worms -> NE-List-of-worms
+; moves the head of the worm
+(define (move-head worm direction)'())
+
+; NEList-of-worms -> NEList-of-worms
+; moves the tail of the worm
 
 ;; World functions
 ; WW -> WW
@@ -59,28 +96,21 @@
     [(key=? (ww-direction cw) "up") ...]
     [(key=? (ww-direction cw) "down") ...]
     [(key=? (ww-direction cw) "left") ...]
-    [(key=? (ww-direction cw) "right") (make-ww
-                                        (make-posn (add1 (posn-x (ww-worm cw))) (posn-y (ww-worm cw)))
-                                        (ww-direction cw))]
+    [(key=? (ww-direction cw) "right") ...]
     [else cw]))
 
 ; WW KeyEvent -> WW
 ; updates the state of the WW upon a Key Event
 (define (key-h cw ke)
   (cond
-    [(key=? ke "up") (make-ww
-                      (make-posn (posn-x (ww-worm cw)) (posn-y (ww-worm cw)))
-                      "up")]
-    [(key=? ke "down") (make-ww
-                      (make-posn (posn-x (ww-worm cw)) (posn-y (ww-worm cw)))
-                      "down")]
-    [(key=? ke "left") (make-ww
-                      (make-posn (posn-x (ww-worm cw)) (posn-y (ww-worm cw)))
-                      "left")]
-    [(key=? ke "right") (make-ww
-                      (make-posn (posn-x (ww-worm cw)) (posn-y (ww-worm cw)))
-                      "right")]
-    [else cw]))
+    [(key=? ke "up") (if (not (key=? (ww-direction cw) "down")) (make-ww (ww-worm cw) ke) cw)]
+    [(key=? ke "down") (if (not (key=? (ww-direction cw) "up")) (make-ww (ww-worm cw) ke) cw)]
+    [(key=? ke "left") (if (not (key=? (ww-direction cw) "right")) (make-ww (ww-worm cw) ke) cw)]
+    [(key=? ke "right") (if (not (key=? (ww-direction cw) "left")) (make-ww (ww-worm cw) ke) cw)]))
+
+; WW -> Image
+; renders the current state of the WW
+(define (render cw) (render-worm (ww-worm cw)))
 
 (define (main-worm rate)
   (big-bang WW1
