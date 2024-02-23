@@ -4,16 +4,14 @@
 ;; Constants
 (define DIAMETER 8)
 (define PIECE (circle DIAMETER "solid" "crimson"))
-(define HEIGHT 100)
-(define WIDTH 100)
+(define SEPARATION (* 2 DIAMETER))
+(define HEIGHT 200)
+(define WIDTH 200)
 (define BACKGROUND-CENTER-POSN (make-posn (/ HEIGHT 2) (/ WIDTH 2)))
 (define BACKGROUND (empty-scene HEIGHT WIDTH))
 (define RATE 0.2)
 
 ;; Data definitions
-; A Worm is a Posn
-; (make-posn Number Number)
-; interpretation the position of the worm in space
 ;
 ; A Direction is one of:
 ; - "up"
@@ -22,7 +20,7 @@
 ; - "right"
 ; interpretation where the worm is headed
 ;
-; A Worm With Tail (WWT) is a NEList-of-Posn, and thus either:
+; A Worm is a NEList-of-Posn, and thus either:
 ; - (cons Worm '())
 ; - (cons Worm WWT)
 ; interpretation the position of WWT in space
@@ -32,18 +30,19 @@
 (define-struct ww [worm direction])
 ; (make-ww NEList-of-Posn String)
 (define WW0 (make-ww (list
-                      (make-posn (/ HEIGHT 2) (/ WIDTH 2))
-                      (make-posn (+ (/ HEIGHT 2) DIAMETER) (/ WIDTH 2))
-                      ;(make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) DIAMETER))
-                      ;(make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) DIAMETER))
+                      (make-posn (/ WIDTH 2) (/ HEIGHT 2))
+                      (make-posn (/ WIDTH 2) (+ SEPARATION  (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 2 SEPARATION) (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 3 SEPARATION) (/ HEIGHT 2)))
                       )
-                     "up"))
+                     "up")) ; Wait a second, this actually is incorrect. You can't be having this disposition of pieces, and this direction. It would crash on itself
 (define WW1 (make-ww (list
-                      (make-posn (/ HEIGHT 2) (/ WIDTH 2))
-                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 1))
-                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 2))
-                      (make-posn (/ HEIGHT 2) (+ (/ WIDTH 2) 3)))
-                     "down"))
+                      (make-posn (/ WIDTH 2) (/ HEIGHT 2))
+                      (make-posn (/ WIDTH 2) (+ SEPARATION  (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 2 SEPARATION) (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 3 SEPARATION) (/ HEIGHT 2)))
+                      )
+                     "down")) 
 (define WW2 (make-ww (list
                       (make-posn (/ HEIGHT 2) (/ WIDTH 4))
                       (make-posn (+ (/ HEIGHT 2) 1) (/ WIDTH 4))
@@ -81,22 +80,26 @@
            "left" "top"
            (render-worm (rest worm)))]))
 
-; NEList-of-worms -> NE-List-of-worms
-; moves the head of the worm
-(define (move-head worm direction)'())
-
-; NEList-of-worms -> NEList-of-worms
-; moves the tail of the worm
+; WW -> WW
+; moves the worm
+(define (move-worm cw)
+  (cond
+    [(empty? (rest worm) worm)]
+    [(key=? (ww-direction cw) "up") (make-ww ...) ]
+    [(key=? (ww-direction cw) "down") (make-ww ...) ]
+    [(key=? (ww-direction cw) "left") (make-ww ...) ]
+    [(key=? (ww-direction cw) "right") (make-ww ...) ]
+    [else cw]))
 
 ;; World functions
 ; WW -> WW
 ; updates the state of the WW after each CPU clock tick
 (define (tock cw)
   (cond
-    [(key=? (ww-direction cw) "up") ...]
-    [(key=? (ww-direction cw) "down") ...]
-    [(key=? (ww-direction cw) "left") ...]
-    [(key=? (ww-direction cw) "right") ...]
+    [(key=? (ww-direction cw) "up") ... ]
+    [(key=? (ww-direction cw) "down") ... ]
+    [(key=? (ww-direction cw) "left") ... ]
+    [(key=? (ww-direction cw) "right") ... ]
     [else cw]))
 
 ; WW KeyEvent -> WW
@@ -106,7 +109,8 @@
     [(key=? ke "up") (if (not (key=? (ww-direction cw) "down")) (make-ww (ww-worm cw) ke) cw)]
     [(key=? ke "down") (if (not (key=? (ww-direction cw) "up")) (make-ww (ww-worm cw) ke) cw)]
     [(key=? ke "left") (if (not (key=? (ww-direction cw) "right")) (make-ww (ww-worm cw) ke) cw)]
-    [(key=? ke "right") (if (not (key=? (ww-direction cw) "left")) (make-ww (ww-worm cw) ke) cw)]))
+    [(key=? ke "right") (if (not (key=? (ww-direction cw) "left")) (make-ww (ww-worm cw) ke) cw)]
+    [else cw]))
 
 ; WW -> Image
 ; renders the current state of the WW
