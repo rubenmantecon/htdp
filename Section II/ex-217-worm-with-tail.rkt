@@ -34,7 +34,7 @@
                       (make-posn (/ WIDTH 2) (+ (* 2 SEPARATION) (/ HEIGHT 2)))
                       (make-posn (/ WIDTH 2) (+ (* 3 SEPARATION) (/ HEIGHT 2)))
                       )
-                     "up")) ; Wait a second, this actually is incorrect. You can't be having this disposition of pieces, and this direction. It would crash on itself
+                     "up")) 
 (define WW1 (make-ww (list
                       (make-posn (/ WIDTH 2) (/ HEIGHT 2))
                       (make-posn (/ WIDTH 2) (+ SEPARATION  (/ HEIGHT 2)))
@@ -43,16 +43,18 @@
                       )
                      "down")) 
 (define WW2 (make-ww (list
-                      (make-posn (/ HEIGHT 2) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 1) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 2) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 3) (/ WIDTH 4)))
+                      (make-posn (/ WIDTH 2) (/ HEIGHT 2))
+                      (make-posn (+ SEPARATION (/ WIDTH 2)) (/ HEIGHT 2))
+                      (make-posn (+ (* 2 SEPARATION) (/ WIDTH 2)) (/ HEIGHT 2))
+                      (make-posn (+ (* 3 SEPARATION) (/ WIDTH 2)) (/ HEIGHT 2))
+                      )
                      "left"))
 (define WW3 (make-ww (list
-                      (make-posn (/ HEIGHT 2) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 1) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 2) (/ WIDTH 4))
-                      (make-posn (+ (/ HEIGHT 2) 3) (/ WIDTH 4)))
+                      (make-posn (/ WIDTH 2) (/ HEIGHT 2))
+                      (make-posn (/ WIDTH 2) (+ SEPARATION  (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 2 SEPARATION) (/ HEIGHT 2)))
+                      (make-posn (/ WIDTH 2) (+ (* 3 SEPARATION) (/ HEIGHT 2)))
+                      )
                      "right"))
 (define WW4 (make-ww
              (list (make-posn (random HEIGHT) (random WIDTH)))
@@ -63,6 +65,8 @@
 (define WW6 (make-ww
              (list (make-posn (random HEIGHT) (random WIDTH)))
              (list-ref (list "up" "down" "left" "right") (random 3))))
+
+(define WW-LIST (list WW0 WW1 WW2 WW3 WW4 WW5 WW6))
 
 ; interpretation: the total state of the world; the position of the worm and towards where is it moving at any point in time and space
 
@@ -79,27 +83,33 @@
            "left" "top"
            (render-worm (rest worm)))]))
 
-; WW -> WW
+; Worm -> Worm
 ; moves the worm
-(define (move-worm cw)
+(define (move-worm worm direction)
+  (cons (move-head worm direction) (move-tail worm)))
+
+; Worm -> Worm
+; moves the worm's head
+(define (move-head worm direction)
   (cond
-    [(empty? (rest (ww-worm cw))) (ww-worm cw)]
-    [(key=? (ww-direction cw) "up") (make-ww ... ...) ]
-    [(key=? (ww-direction cw) "down") (make-ww ... ...) ]
-    [(key=? (ww-direction cw) "left") (make-ww ... ...) ]
-    [(key=? (ww-direction cw) "right") (make-ww ... ...) ]
-    [else cw]))
+    [(key=? direction "up") (make-posn (posn-x (first worm)) (sub1 (posn-y (first worm))))]
+    [(key=? direction "down") (make-posn (posn-x (first worm)) (add1 (posn-y (first worm)))) ]
+    [(key=? direction "left") (make-posn (sub1 (posn-x (first worm))) (posn-y (first worm))) ]
+    [(key=? direction "right") (make-posn (add1 (posn-x (first worm))) (posn-y (first worm))) ]
+    [else worm]))
+
+; Worm -> Worm
+; moves a worm's tail based off the head's movement
+(define (move-tail worm)
+  (cond
+    [(empty? (rest worm)) '()]
+    [else (cons (first worm) (move-tail (rest worm)))]))
 
 ;; World functions
 ; WW -> WW
 ; updates the state of the WW after each CPU clock tick
 (define (tock cw)
-  (cond
-    [(key=? (ww-direction cw) "up") ... ]
-    [(key=? (ww-direction cw) "down") ... ]
-    [(key=? (ww-direction cw) "left") ... ]
-    [(key=? (ww-direction cw) "right") ... ]
-    [else cw]))
+  (make-ww (move-worm (ww-worm cw) (ww-direction cw)) (ww-direction cw)))
 
 ; WW KeyEvent -> WW
 ; updates the state of the WW upon a Key Event
@@ -116,7 +126,9 @@
 (define (render cw) (render-worm (ww-worm cw)))
 
 (define (main-worm rate)
-  (big-bang WW1
+  (big-bang
+      WW3
+      ;(list-ref WW-LIST (random (length WW-LIST)))
     [on-tick tock]
     [on-draw render]
     [on-key key-h]
