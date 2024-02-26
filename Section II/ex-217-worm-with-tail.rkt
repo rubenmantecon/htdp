@@ -18,13 +18,12 @@
 ; - "down"
 ; - "left"
 ; - "right"
-; interpretation where the worm is headed
+; interpretation: where the worm is headed
 ;
 ; A Worm is a NEList-of-Posn, and thus either:
 ; - (cons Worm '())
 ; - (cons Worm WWT)
-; interpretation the position of WWT in space
-;
+; interpretation: the position of WWT in space
 ;
 ; A Worm World (WW) is a structure:
 (define-struct ww [worm direction])
@@ -65,7 +64,7 @@
              (list (make-posn (random HEIGHT) (random WIDTH)))
              (list-ref (list "up" "down" "left" "right") (random 3))))
 
-; interpretation the total state of the world; the position of the worm and towards where is it moving at any point in time and space
+; interpretation: the total state of the world; the position of the worm and towards where is it moving at any point in time and space
 
 ;; Helper functions
 ; List-of-worms -> Image
@@ -84,11 +83,11 @@
 ; moves the worm
 (define (move-worm cw)
   (cond
-    [(empty? (rest worm) worm)]
-    [(key=? (ww-direction cw) "up") (make-ww ...) ]
-    [(key=? (ww-direction cw) "down") (make-ww ...) ]
-    [(key=? (ww-direction cw) "left") (make-ww ...) ]
-    [(key=? (ww-direction cw) "right") (make-ww ...) ]
+    [(empty? (rest (ww-worm cw))) (ww-worm cw)]
+    [(key=? (ww-direction cw) "up") (make-ww ... ...) ]
+    [(key=? (ww-direction cw) "down") (make-ww ... ...) ]
+    [(key=? (ww-direction cw) "left") (make-ww ... ...) ]
+    [(key=? (ww-direction cw) "right") (make-ww ... ...) ]
     [else cw]))
 
 ;; World functions
