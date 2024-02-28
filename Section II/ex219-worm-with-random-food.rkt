@@ -133,36 +133,28 @@
            "left" "top"
            (render-worm (rest worm) direction))]))
 
-(define (grow-worm cw)
-  (eat-food (ww-worm cw) (ww-direction cw)))
-
-; Posns Direction-> List-of-worms
-; update the worm's head when it has eaten a food piece
-(define (eat-food segment direction)
-  (cond
-    [(key=? direction "up") (make-posn (posn-x segment) (sub1 (posn-y segment)))]
-    [(key=? direction "down") (make-posn (posn-x segment) (add1 (posn-y segment))) ]
-    [(key=? direction "left") (make-posn (sub1 (posn-x segment)) (posn-y segment)) ]
-    [(key=? direction "right") (make-posn (add1 (posn-x segment)) (posn-y segment)) ]))
-; Posn List-of-worms Direction
+; List-of-worms Direction ->
 ; grow the worm's tail by one segment
-(define (grow-tail worm direction)
-  (cons worm (cons (make-posn
-                    (if (or (key=? direction "up") (key=? direction "down")) (eat-food (posn-x (last-segment worm)) direction) (posn-x (last-segment worm)))
-                    (if (or (key=? direction "left") (key=? direction "right")) (eat-food (posn-y (last-segment worm)) direction) (posn-y (last-segment worm)) )))))
+(define (grow-tail worm)
+  (append worm (cons (add-1-depending-on-position (last-segment worm)) '())))
 
-
+; List-of-worms -> List-of-worms
+; return the last segment of a worm
 (define (last-segment worm)
   (cond
-    [(empty? (rest worm)) (first worm)]
+    [(empty? (rest worm)) worm]
     [else (last-segment (rest worm))]))
+
+; Worm -> Worm
+; updates the position of a final worm piece
+(define (add-1-depending-on-position worm) '())
 
 ;; World functions
 ; WW -> WW
 ; updates the state of the WW after each CPU clock tick
 (define (tock cw)
   (cond
-    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) (eat-food (ww-worm cw) (ww-direction cw)) (ww-direction cw))]
+    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) ... (ww-direction cw))]
     [else (make-ww (ww-food cw) (move-worm (ww-worm cw) (ww-direction cw)) (ww-direction cw))]
     ))
 
