@@ -10,7 +10,7 @@
 (define WIDTH 200)
 (define BACKGROUND-CENTER-POSN (make-posn (/ HEIGHT 2) (/ WIDTH 2)))
 (define BACKGROUND (empty-scene HEIGHT WIDTH))
-(define RATE 0.25)
+(define RATE 0.1)
 
 ;; Data definitions
 ;
@@ -35,7 +35,7 @@
               (make-posn (/ WIDTH 2) (+ 1 (/ HEIGHT 2)))
               (make-posn (/ WIDTH 2) (+ 2 (/ HEIGHT 2)))
               (make-posn (/ WIDTH 2) (+ 3 (/ HEIGHT 2)))
-              (make-posn (/ WIDTH 2) (+ 4(/ HEIGHT 2))))
+              (make-posn (/ WIDTH 2) (+ 4 (/ HEIGHT 2))))
              "up")) 
 (define WW1 (make-ww
              (make-posn (random WIDTH) (random HEIGHT))
@@ -126,35 +126,23 @@
 (define (render-worm worm direction)
   (cond
     [(empty? worm) BACKGROUND]
-    [else (place-image/align
+    [else (place-image
            PIECE
            (posn-x (first worm))
            (posn-y (first worm))
-           "left" "top"
            (render-worm (rest worm) direction))]))
 
-; List-of-worms Direction ->
-; grow the worm's tail by one segment
-(define (grow-tail worm)
-  (append worm (cons (add-1-depending-on-position (last-segment worm)) '())))
-
-; List-of-worms -> List-of-worms
-; return the last segment of a worm
-(define (last-segment worm)
-  (cond
-    [(empty? (rest worm)) worm]
-    [else (last-segment (rest worm))]))
-
-; Worm -> Worm
-; updates the position of a final worm piece
-(define (add-1-depending-on-position worm) '())
+; Posn List-of-worms Direction ->
+; eats the food
+(define (eat-food food worm direction)
+  (cons (move-head worm direction) (cons food worm)))
 
 ;; World functions
 ; WW -> WW
 ; updates the state of the WW after each CPU clock tick
 (define (tock cw)
   (cond
-    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) ... (ww-direction cw))]
+    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) (move-tail (eat-food (ww-food cw) (ww-worm cw) (ww-direction cw))) (ww-direction cw))]
     [else (make-ww (ww-food cw) (move-worm (ww-worm cw) (ww-direction cw)) (ww-direction cw))]
     ))
 
@@ -190,11 +178,10 @@
 
 (define (main-worm rate)
   (big-bang
-      WW3
-      ;(list-ref WW-LIST (random (length WW-LIST)))
-    [on-tick tock rate]
+    (list-ref WW-LIST (random (length WW-LIST)))
+    [on-tick tock]
     [on-draw render]
     [on-key key-h]
     [stop-when end? render-end]
-    [state #t]
+    [state #f]
     ))
