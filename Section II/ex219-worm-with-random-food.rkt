@@ -4,13 +4,13 @@
 ;; Constants
 (define DIAMETER 8)
 (define PIECE (circle DIAMETER "solid" "crimson"))
-(define FOOD-PIECE (circle (+ 1 DIAMETER) "solid" "lime green"))
+(define FOOD-PIECE (circle DIAMETER "solid" "lime green"))
 (define SEPARATION (* 2 DIAMETER))
 (define HEIGHT 200)
 (define WIDTH 200)
 (define BACKGROUND-CENTER-POSN (make-posn (/ HEIGHT 2) (/ WIDTH 2)))
 (define BACKGROUND (empty-scene HEIGHT WIDTH))
-(define RATE 0.2)
+(define RATE 0.25)
 
 ;; Data definitions
 ;
@@ -30,12 +30,12 @@
 (define-struct ww [food worm direction])
 ; (make-ww Posn NEList-of-Posn String)
 (define WW0 (make-ww
-             (make-posn (random WIDTH) (random HEIGHT))
+             (make-posn (+ (/ WIDTH 2) SEPARATION) (/ HEIGHT 2))
              (list     
-              (make-posn (/ WIDTH 2) (/ HEIGHT 2))
-              (make-posn (/ WIDTH 2) (+ SEPARATION  (/ HEIGHT 2)))
-              (make-posn (/ WIDTH 2) (+ (* 2 SEPARATION) (/ HEIGHT 2)))
-              (make-posn (/ WIDTH 2) (+ (* 3 SEPARATION) (/ HEIGHT 2))))
+              (make-posn (/ WIDTH 2) (+ 1 (/ HEIGHT 2)))
+              (make-posn (/ WIDTH 2) (+ 2 (/ HEIGHT 2)))
+              (make-posn (/ WIDTH 2) (+ 3 (/ HEIGHT 2)))
+              (make-posn (/ WIDTH 2) (+ 4(/ HEIGHT 2))))
              "up")) 
 (define WW1 (make-ww
              (make-posn (random WIDTH) (random HEIGHT))
@@ -74,7 +74,7 @@
 (check-satisfied (food-create (make-posn 1 1)) not=-1-1?)
 (define (food-create p)
   (food-check-create
-     p (make-posn (random (- WIDTH 5)) (random (- HEIGHT 5)))))
+   p (make-posn (random WIDTH) (random HEIGHT))))
  
 ; Posn Posn -> Posn 
 ; generative recursion 
@@ -123,7 +123,7 @@
 
 ; List-of-worms -> Image
 ; recursively renders the worm
-(define (render-worm worm)
+(define (render-worm worm direction)
   (cond
     [(empty? worm) BACKGROUND]
     [else (place-image/align
@@ -131,21 +131,38 @@
            (posn-x (first worm))
            (posn-y (first worm))
            "left" "top"
-           (render-worm (rest worm)))]))
+           (render-worm (rest worm) direction))]))
 
-; Posn List-of-worms -> List-of-worms
-; update the worm when it has eaten a food piece
-(define (eat-food food worm)
-  (cons food worm))
+(define (grow-worm cw)
+  (eat-food (ww-worm cw) (ww-direction cw)))
+
+; Posns Direction-> List-of-worms
+; update the worm's head when it has eaten a food piece
+(define (eat-food segment direction)
+  (cond
+    [(key=? direction "up") (make-posn (posn-x segment) (sub1 (posn-y segment)))]
+    [(key=? direction "down") (make-posn (posn-x segment) (add1 (posn-y segment))) ]
+    [(key=? direction "left") (make-posn (sub1 (posn-x segment)) (posn-y segment)) ]
+    [(key=? direction "right") (make-posn (add1 (posn-x segment)) (posn-y segment)) ]))
+; Posn List-of-worms Direction
+; grow the worm's tail by one segment
+(define (grow-tail worm direction)
+  (cons worm (cons (make-posn
+                    (if (or (key=? direction "up") (key=? direction "down")) (eat-food (posn-x (last-segment worm)) direction) (posn-x (last-segment worm)))
+                    (if (or (key=? direction "left") (key=? direction "right")) (eat-food (posn-y (last-segment worm)) direction) (posn-y (last-segment worm)) )))))
 
 
+(define (last-segment worm)
+  (cond
+    [(empty? (rest worm)) (first worm)]
+    [else (last-segment (rest worm))]))
 
 ;; World functions
 ; WW -> WW
 ; updates the state of the WW after each CPU clock tick
 (define (tock cw)
   (cond
-    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) (eat-food (ww-food cw) (ww-worm cw)) (ww-direction cw))]
+    [(equal? (first (ww-worm cw)) (ww-food cw)) (make-ww (food-create (ww-food cw)) (eat-food (ww-worm cw) (ww-direction cw)) (ww-direction cw))]
     [else (make-ww (ww-food cw) (move-worm (ww-worm cw) (ww-direction cw)) (ww-direction cw))]
     ))
 
@@ -166,7 +183,7 @@
    FOOD-PIECE
    (posn-x (ww-food cw))
    (posn-y (ww-food cw))
-   (render-worm (ww-worm cw))
+   (render-worm (ww-worm cw) (ww-direction cw))
    ))
 
 ; WW -> Boolen
@@ -183,8 +200,9 @@
   (big-bang
       WW3
       ;(list-ref WW-LIST (random (length WW-LIST)))
-    [on-tick tock]
+    [on-tick tock rate]
     [on-draw render]
     [on-key key-h]
     [stop-when end? render-end]
+    [state #t]
     ))
