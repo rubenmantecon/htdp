@@ -91,11 +91,13 @@
 ; Block -> Boolean
 ; checks wether a block landed on the ground
 (define (block-grounded? block)
+  (if (>= (block-y block) (- (- HEIGHT (/ SIZE 2)) 1)) #true #false)) ; beware of magic number here
 
 ; Block Block -> Boolean
 ; checks wether a block landed on another block
 ; FIXME, needs to account for half a block size per each block
 (define (block-on-block? block-descending block-stationed)
+  (if (and (equal? (block-x block-descending) (block-x block-stationed)) (equal? (block-y block-descending) (- (- (block-y block-stationed) SIZE) 1))) ; beware of magic number here, too
       #true
       #false))
 
