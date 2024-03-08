@@ -76,28 +76,26 @@
     [(key=? "right" ke) (make-block (add1 (block-x block)) (block-y block))]
     ))
 
-(define (block-moving? tetris)
-  (block-landed? (tetris-block tetris) (tetris-landscape tetris)))
+(define (block-landed? tetris)
+  (block-landed-on-landscape? (tetris-block tetris) (tetris-landscape tetris)))
 
 ; Block Landscape -> Boolen
 ; checks wether a block has landed, either on the ground or another block
-(define (block-landed? block landscape)
+(define (block-landed-on-landscape? block landscape)
   (cond
     [(empty? landscape) #false]
     [else (if (or (block-grounded? block) (block-on-block? block (first landscape)))
               #true
-              (block-landed? block (rest landscape)))]))
+              (block-landed-on-landscape? block (rest landscape)))]))
 
 ; Block -> Boolean
 ; checks wether a block landed on the ground
 (define (block-grounded? block)
-  (if (>= (block-y block) (- (- HEIGHT (/ SIZE 2)) 1)) #true #false))
 
 ; Block Block -> Boolean
 ; checks wether a block landed on another block
 ; FIXME, needs to account for half a block size per each block
 (define (block-on-block? block-descending block-stationed)
-  (if (and (equal? (block-x block-descending) (block-x block-stationed)) (equal? (+ (block-y block-descending) SIZE 2) (block-y block-stationed)))
       #true
       #false))
 
@@ -123,7 +121,7 @@
 ; Tetris -> Tetris
 ; updates the state of a Tetris game per CPU clock tick
 (define (tetris-tock tetris)
-  (if (block-moving? tetris)
+  (if (block-landed? tetris)
       (make-tetris (block-generate (tetris-block tetris)) (cons (tetris-block tetris) (tetris-landscape tetris)))
       (make-tetris (make-block (block-x (tetris-block tetris)) (add1 (block-y (tetris-block tetris)))) (tetris-landscape tetris))))
 
@@ -137,7 +135,7 @@
    (render-landscape (tetris-landscape tetris))))
 
 ; Tetris KeyEvent -> Tetris
-; updates the states of a Tetris game after an arrow key press
+; updates the state of a Tetris game after an arrow key press
 (define (tetris-key-h tetris ke)
   (cond
     [(or (key=? "right" ke) (key=? "left" ke) (key=? "down" ke)) (make-tetris (move-block (tetris-block tetris) ke) (tetris-landscape tetris))]
