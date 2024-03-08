@@ -3,8 +3,8 @@
 #reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname ex221-tetris-main) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp")) #f)))
 ;; Constants
 (define HEIGHT 200)
-(define WIDTH 150) ; # of blocks, horizontally 
-(define SIZE 15) ; blocks are squares
+(define WIDTH 100) ; # of blocks, horizontally 
+(define SIZE 10) ; blocks are squares
 (define SCENE-SIZE (* WIDTH SIZE))
 (define BLOCK ; red squares with black rims
   (overlay
@@ -32,7 +32,7 @@
 ; interpretation: depicts a block whose left corner is (* x SIZE) pixels from the left and (* y SIZE) pixels from the top
 
 ;; Data collections
-(define landscape0 (list (make-block 0 (- HEIGHT)) (make-block (/ SIZE 2) (- HEIGHT (* 2 SIZE))) (make-block (/ SIZE 2) (- HEIGHT (* 3 SIZE)))))
+(define landscape0 (list (make-block 10 10) (make-block 50 100) (make-block 90 200)))
 (define block-dropping0 (make-block 2 2))
 (define tetris0 (make-tetris block-dropping0 landscape0))
 (define tetris0-drop (make-tetris '() landscape0))
@@ -41,13 +41,15 @@
 (define block-on-block-on-block (make-block 0 (- HEIGHT 3)))
 
 ;; Helper functions
+; TODO: for now, blocks are rendered outside of the scene.
+; Mechanisms must be put in place to avoid errors in rendering: no half blocks, etc
 ; Tetris -> Image
 ; renders a tetris instance
 (define (tetris-render tetris)
   (place-image
    BLOCK
-   (* (block-x (tetris-block tetris)) SIZE)
-   (* (block-y (tetris-block tetris)) SIZE)
+   (block-x (tetris-block tetris))
+   (block-y (tetris-block tetris))
    (render-landscape (tetris-landscape tetris))))
 
 ; Landscape -> Image
@@ -66,8 +68,8 @@
 (define (render-block block)
   (place-image
    BLOCK
-   (* (block-x block) SIZE)
-   (* (block-y block) SIZE)
+   (block-x block)
+   (block-y block)
    BACKGROUND))
 
 ;; World functions
