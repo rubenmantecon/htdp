@@ -76,17 +76,15 @@
     [(key=? "right" ke) (make-block (add1 (block-x block)) (block-y block))]
     ))
 
+; Tetris -> Boolean
+; checks wether a block has landed
 (define (block-landed? tetris)
   (block-landed-on-landscape? (tetris-block tetris) (tetris-landscape tetris)))
 
 ; Block Landscape -> Boolen
-; checks wether a block has landed, either on the ground or another block
+; checks wether a block has landed on the landscape
 (define (block-landed-on-landscape? block landscape)
-  (cond
-    [(empty? landscape) #false]
-    [else (if (or (block-grounded? block) (block-on-block? block (first landscape)))
-              #true
-              (block-landed-on-landscape? block (rest landscape)))]))
+  (or (block-grounded? block) (block-on-block? block landscape)))
 
 ; Block -> Boolean
 ; checks wether a block landed on the ground
@@ -95,11 +93,8 @@
 
 ; Block Block -> Boolean
 ; checks wether a block landed on another block
-; FIXME, needs to account for half a block size per each block
-(define (block-on-block? block-descending block-stationed)
-  (if (and (equal? (block-x block-descending) (block-x block-stationed)) (equal? (block-y block-descending) (- (- (block-y block-stationed) SIZE) 1))) ; beware of magic number here, too
-      #true
-      #false))
+(define (block-on-block? block landscape)
+  (member? (make-block (block-x block) (+ (+ (block-y block) SIZE) 1)) landscape)) ; beware of magic number here
 
 ; Block -> Block
 ; ??? (adapted from food-create on ex 219)
