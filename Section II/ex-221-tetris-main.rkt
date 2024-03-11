@@ -5,8 +5,8 @@
 (require 2htdp/image)
 
 ;; Constants
-(define HEIGHT 200)
-(define WIDTH 100) ; # of blocks, horizontally 
+(define HEIGHT 100)
+(define WIDTH 10) ; # of blocks, horizontally 
 (define SIZE 10) ; blocks are squares
 (define SCENE-SIZE (* WIDTH SIZE))
 (define BLOCK ; red squares with black rims
@@ -14,7 +14,7 @@
    (square (- SIZE 1) "solid" "red")
    (square SIZE "outline" "black")))
 (define BACKGROUND (empty-scene WIDTH HEIGHT))
-(define RATE 0.1)
+(define RATE 0.5)
 
 ;; Data definitions
 (define-struct tetris [block landscape])
@@ -36,13 +36,13 @@
 ; interpretation: depicts a block whose left corner is (* x SIZE) pixels from the left and (* y SIZE) pixels from the top
 
 ;; Data collections
-(define landscape0 (list (make-block 10 10) (make-block 50 100) (make-block 90 200)))
-(define block-dropping0 (make-block 2 2))
+(define block-dropping0 (make-block 1 1))
+(define block-landed (make-block 1 (- HEIGHT 1)))
+(define block-on-block (make-block 2 (- HEIGHT 2)))
+(define block-on-block-on-block (make-block 0 (- HEIGHT 3)))
+(define landscape0 (list (make-block 4 10) (make-block 2 10) block-landed))
 (define tetris0 (make-tetris block-dropping0 landscape0))
 (define tetris0-drop (make-tetris '() landscape0))
-(define block-landed (make-block 0 (- HEIGHT 1)))
-(define block-on-block (make-block 0 (- HEIGHT 2)))
-(define block-on-block-on-block (make-block 0 (- HEIGHT 3)))
 
 ;; Helper functions
 ; TODO: for now, blocks are rendered outside of the scene.
@@ -54,8 +54,8 @@
     [(empty? landscape) BACKGROUND]
     [else (place-image
            BLOCK
-           (block-x (first landscape))
-           (block-y (first landscape))
+           (* (block-x (first landscape)) SIZE)
+           (* (block-y (first landscape)) SIZE)
            (render-landscape (rest landscape)))]))
 
 ; Block -> Image
@@ -63,8 +63,8 @@
 (define (render-block block)
   (place-image
    BLOCK
-   (block-x block)
-   (block-y block)
+   (* (block-x block) SIZE)
+   (* (block-y block) SIZE)
    BACKGROUND))
 
 ; Block -> Block
@@ -127,8 +127,8 @@
 (define (tetris-render tetris)
   (place-image
    BLOCK
-   (block-x (tetris-block tetris))
-   (block-y (tetris-block tetris))
+   (* (block-x (tetris-block tetris)) SIZE)
+   (* (block-y (tetris-block tetris)) SIZE)
    (render-landscape (tetris-landscape tetris))))
 
 ; Tetris KeyEvent -> Tetris
