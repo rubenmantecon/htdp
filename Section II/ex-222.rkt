@@ -5,8 +5,8 @@
 (require 2htdp/image)
 
 ;; Constants
-(define HEIGHT 200)
-(define WIDTH 100) ; # of blocks, horizontally 
+(define HEIGHT 210)
+(define WIDTH 110) ; # of blocks, horizontally 
 (define SIZE 10) ; blocks are squares
 (define SCENE-SIZE (* WIDTH SIZE))
 (define BLOCK ; red squares with black rims
@@ -14,7 +14,7 @@
    (square (- SIZE 1) "solid" "red")
    (square SIZE "outline" "black")))
 (define BACKGROUND (empty-scene WIDTH HEIGHT))
-(define RATE 0.1)
+(define RATE 0.75)
 
 ;; Data definitions
 (define-struct tetris [block landscape])
@@ -36,13 +36,13 @@
 ; interpretation: depicts a block whose left corner is (* x SIZE) pixels from the left and (* y SIZE) pixels from the top
 
 ;; Data collections
-(define landscape0 (list (make-block 10 10) (make-block 50 100) (make-block 90 200)))
-(define block-dropping0 (make-block 2 2))
+(define block-dropping0 (make-block 4 1))
+(define block-landed (make-block 4 20))
+(define block-on-block (make-block 2 (- HEIGHT 2)))
+(define block-on-block-on-block (make-block 0 (- HEIGHT 3)))
+(define landscape0 (list (make-block 4 10) (make-block 2 10) block-landed))
 (define tetris0 (make-tetris block-dropping0 landscape0))
 (define tetris0-drop (make-tetris '() landscape0))
-(define block-landed (make-block 0 (- HEIGHT 1)))
-(define block-on-block (make-block 0 (- HEIGHT 2)))
-(define block-on-block-on-block (make-block 0 (- HEIGHT 3)))
 
 ;; Helper functions
 ; TODO: for now, blocks are rendered outside of the scene.
@@ -54,8 +54,8 @@
     [(empty? landscape) BACKGROUND]
     [else (place-image
            BLOCK
-           (block-x (first landscape))
-           (block-y (first landscape))
+           (* (block-x (first landscape)) SIZE)
+           (* (block-y (first landscape)) SIZE)
            (render-landscape (rest landscape)))]))
 
 ; Block -> Image
@@ -63,8 +63,8 @@
 (define (render-block block)
   (place-image
    BLOCK
-   (block-x block)
-   (block-y block)
+   (* (block-x block) SIZE)
+   (* (block-y block) SIZE)
    BACKGROUND))
 
 ; Block -> Block
@@ -74,6 +74,7 @@
     [(key=? "down" ke) (make-block (block-x block) (add1 (block-y block)))]
     [(key=? "left" ke) (make-block (sub1 (block-x block)) (block-y block))]
     [(key=? "right" ke) (make-block (add1 (block-x block)) (block-y block))]
+    [else block]
     ))
 
 ; Tetris -> Boolean
@@ -83,36 +84,38 @@
 
 ; Tetris -> Boolean
 ; checks wether a block has hit a vertical limit
-(define (block-hit? tetris)
-  (or (block-at-width? (tetris-block tetris)) (block-against-block? (tetris-block tetris) (tetris-landscape tetris))))
+(define (block-hit? tetris ke)
+  (or
+   (block-at-width? (tetris-block tetris))
+   (block-against-block? (tetris-block tetris) (tetris-landscape tetris) ke)))
 
 ; Block -> Boolean
 ; checks wether a block landed on the ground
 (define (block-grounded? block)
-  (if (>= (block-y block) (- (- HEIGHT (/ SIZE 2)) 1)) #true #false)) ; beware of magic number here
+  (if (>= (block-y block) (- (/ HEIGHT SIZE) 1)) #true #false)) ; beware of magic number here
 
 ; Block Block -> Boolean
 ; checks wether a block landed on another block
 (define (block-on-block? block landscape)
-  (member? (make-block (block-x block) (+ (+ (block-y block) SIZE) 1)) landscape)) ; beware of magic number here
+  (member? (make-block (block-x block) (add1 (block-y block))) landscape))
 
 ; Block -> Boolean
 ; checks wether a block touched the limits of the scene
 (define (block-at-width? block)
-  (or (>= (block-x block) WIDTH) (<= (block-x block) 0)))
+  (or (equal? (block-x block) SIZE) (equal? (block-x block) 1)))
 
 ; Block Block -> Boolean
 ; checks wether block is against the side of another
-(define (block-against-block? block landscape)
-  (or (member? (make-block (+ (+ (block-x block) SIZE) 1) (block-x block)) landscape) ; beware of magic number here
-      (member? (make-block (- (- (block-x block) SIZE) 1) (block-x block)) landscape))) ; beware of magic number here
+(define (block-against-block? block landscape direction)
+  (or (and (key=? "right" direction) (member? (make-block (add1 (block-x block)) (block-y block)) landscape))
+      (and (key=? "left" direction) (member? (make-block (sub1 (block-x block)) (block-y block)) landscape))))
 
 ; Block -> Block
 ; ??? (adapted from food-create on ex 219)
 (check-satisfied (block-generate (make-block 1 1)) not=-1-1?)
 (define (block-generate block)
   (block-check-generate
-   block (make-block (random WIDTH) 0)))
+   block (make-block (list-ref (range 1 SIZE 1) (random (- SIZE 1))) 1)))
 
 ; Block Block -> Block
 ; generative recursion
@@ -128,28 +131,27 @@
 ;; World functions
 ; Tetris -> Tetris
 ; updates the state of a Tetris game per CPU clock tick
-(define (tetris-tock tetris)   
-  (if (block-landed? tetris)
-      (make-tetris (block-generate (tetris-block tetris)) (cons (tetris-block tetris) (tetris-landscape tetris)))
-      (make-tetris (make-block (block-x (tetris-block tetris)) (add1 (block-y (tetris-block tetris)))) (tetris-landscape tetris))))
+(define (tetris-tock tetris)
+  (cond
+    [(block-landed? tetris) (make-tetris (block-generate (tetris-block tetris)) (cons (tetris-block tetris) (tetris-landscape tetris)))]
+    [else (make-tetris (move-block (tetris-block tetris) "down") (tetris-landscape tetris))])
+  )
 
 ; Tetris -> Image
 ; renders a tetris instance
 (define (tetris-render tetris)
   (place-image
    BLOCK
-   (block-x (tetris-block tetris))
-   (block-y (tetris-block tetris))
+   (* (block-x (tetris-block tetris)) SIZE)
+   (* (block-y (tetris-block tetris)) SIZE)
    (render-landscape (tetris-landscape tetris))))
 
 ; Tetris KeyEvent -> Tetris
 ; updates the state of a Tetris game after an arrow key press
 (define (tetris-key-h tetris ke)
-  (if (or (key=? "right" ke) (key=? "left" ke) (key=? "down" ke))
-          (if (block-hit? tetris)
-            (make-tetris (tetris-block tetris) (tetris-landscape tetris))
-            (make-tetris (move-block (tetris-block tetris) ke) (tetris-landscape tetris)))
-      tetris)) ; Hm, I'm not happy with the contour of this
+  (cond
+    [(block-hit? tetris ke) tetris]
+    [else (make-tetris (move-block (tetris-block tetris) ke) (tetris-landscape tetris))]))
 
 ; WorldState -> WorldState
 ; world program
