@@ -56,26 +56,32 @@
 ;; Helper functions
 ; UFO -> Image
 ; render the UFO
+(check-expect (render-ufo ufo0) (place-image UFO (posn-x ufo0) (posn-y ufo0) BACKGROUND))
 (define (render-ufo ufo) (place-image UFO (posn-x ufo) (posn-y ufo) BACKGROUND))
 
 ; Tank -> Image
 ; render the tank
-(define (render-tank tank) (place-image TANK (posn-x (tank-position tank)) (posn-y (tank-position tank))))
+(check-expect (render-tank tank0) (place-image TANK (posn-x (tank-position tank0)) (posn-y (tank-position tank0)) BACKGROUND))
+(define (render-tank tank) (place-image TANK (posn-x (tank-position tank)) (posn-y (tank-position tank)) BACKGROUND))
 
 ; ShotList -> Image
 ; renders a ShotList
 (define (render-shotlist shotlist)
   (cond
-    [(empty? (rest shotlist)) BACKGROUND]
+    [(empty? shotlist) BACKGROUND]
     [else (place-image
-           (first shotlist)
+           SHOT
            (posn-x (first shotlist))
            (posn-y (first shotlist))
            (render-shotlist (rest shotlist)))]))
 
 ; UFO -> Boolean
 ; checks whether the UFO has reached the bottom of the scene
-(define (ufo-breached? ufo) (equal? (posn-y ufo) HEIGHT))
+(check-expect (ufo-breached? ufo0 tank0) #false)
+(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.89)) tank0) #false)
+(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.90)) tank0) #true)
+(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.95)) tank0) #true)
+(define (ufo-breached? ufo tank) (>= (posn-y ufo) (posn-y (tank-position tank))))
 
 ; UFO -> Boolean
 ; checks whether the UFO has crashed against the tank
