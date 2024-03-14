@@ -8,9 +8,9 @@
 (define UFO-WIDTH 24)
 (define UFO-HEIGHT 2)
 (define UFO-DIAMETER 4)
-(define TANK-WIDTH 6)
-(define TANK-HEIGHT 4)
-(define SHOT-SIZE 2)
+(define TANK-WIDTH 8)
+(define TANK-HEIGHT 6)
+(define SHOT-SIZE 4)
 (define UFO (overlay
              (rectangle UFO-WIDTH UFO-HEIGHT "solid" "yellow")
              (circle UFO-DIAMETER "solid" "royal blue")))
@@ -36,13 +36,13 @@
 ; A Tank is a structure:
 (define-struct tank [position direction])
 ; (make-tank Posn String)
-(define tank0 (make-tank (make-posn (/ WIDTH 2) (* HEIGHT 0.80)) "right"))
+(define tank0 (make-tank (make-posn (/ WIDTH 2) (* HEIGHT 0.90)) "right"))
 ; interpretation: the position of the tank in the scene, and which direction in the X axis is going
 ;
 ; A ShotList is a NEList-of-Posn, and thus either:
 ; - (cons Posn '())
 ; - (cons Posn ShotList)
-(define shotlist0 (list (make-posn 100 30) (make-posn 110 40)))
+(define shotlist0 (list (make-posn 40 150) (make-posn 70 150)))
 ; interpretation: the position of the shots in space
 ;
 ; A SpaceWar is a structure:
