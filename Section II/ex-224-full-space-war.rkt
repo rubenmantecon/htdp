@@ -30,21 +30,25 @@
 ; 
 ; A UFO is a Posn
 ; (make-posn x y)
+(define ufo0 (make-posn (/ WIDTH 2) (* HEIGHT 0.20)))
 ; interpretation: the position of the UFO in the scene
 ;
 ; A Tank is a structure:
 (define-struct tank [position direction])
 ; (make-tank Posn String)
+(define tank0 (make-tank (make-posn (/ WIDTH 2) (* HEIGHT 0.80)) "right"))
 ; interpretation: the position of the tank in the scene, and which direction in the X axis is going
 ;
 ; A ShotList is a NEList-of-Posn, and thus either:
 ; - (cons Posn '())
 ; - (cons Posn ShotList)
+(define shotlist0 (list (make-posn 100 30) (make-posn 110 40)))
 ; interpretation: the position of the shots in space
 ;
 ; A SpaceWar is a structure:
 (define-struct sw [ufo tank shotlist])
 ; (make-sw Posn Tank ShotList)
+(define sw0 (make-sw ufo0 tank0 shotlist0))
 ; interpretation: the full state of the space war
 
 ;; Data collections
