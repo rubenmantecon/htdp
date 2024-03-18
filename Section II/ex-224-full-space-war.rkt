@@ -40,10 +40,11 @@
 (define tank0 (make-tank (make-posn (/ WIDTH 2) (* HEIGHT 0.90)) "right"))
 ; interpretation: the position of the tank in the scene, and which direction in the X axis is going
 ;
-; A ShotList is a NEList-of-Posn, and thus either:
+; A ShotList is a List-of-Posn, and thus either:
+; - '()
 ; - (cons Posn '())
 ; - (cons Posn ShotList)
-(define shotlist0 (list (make-posn 40 150) (make-posn 70 150)))
+(define shotlist0 (list (make-posn 40 100) (make-posn 80 100)))
 ; interpretation: the position of the shots in space
 ;
 ; A SpaceWar is a structure:
@@ -51,8 +52,6 @@
 ; (make-sw Posn Tank ShotList)
 (define sw0 (make-sw ufo0 tank0 shotlist0))
 ; interpretation: the full state of the space war
-
-;; Data collections
 
 ;; Helper functions
 ; UFO -> Image
