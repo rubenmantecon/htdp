@@ -90,8 +90,50 @@
                                     (equal? (- (posn-x (tank-position tank)) TANK-WIDTH) 0)))
 
 ; UFO ShotList -> Boolean
-; checks whether a shot has hit the UFO
-(define (ufo-hit? ufo shotlist)...)
+; checks whether the UFO has been shot down
+(check-expect (ufo-destroyed? ufo0 shotlist0) #false)
+(define (ufo-destroyed? ufo shotlist)
+  (cond
+    [(empty? shotlist) #false]
+    [else (if
+           (within-hit-range? ufo (first shotlist))
+           #true
+           (ufo-destroyed? ufo (rest shotlist)))]))
+
+(check-expect (within-hit-range? ufo0 (first shotlist0)) #false)
+(check-expect (within-hit-range? ufo0 (second shotlist0)) #false)
+(check-expect (within-hit-range? ufo0 (make-posn (add1 (posn-x ufo0)) (add1 (posn-y ufo0)))) #true)
+(check-expect (within-hit-range? ufo0 (make-posn (+ 3 (posn-x ufo0)) (+ 3 (posn-y ufo0)))) #true)
+(check-expect (within-hit-range? ufo0 (make-posn (+ 5 (posn-x ufo0)) (+ 3 (posn-y ufo0)))) #false)
+(define (within-hit-range? ufo shot) 
+  (and
+   (and
+    (>= (posn-x shot) (- (posn-x ufo) (/ UFO-WIDTH 2)))
+    (<= (posn-x shot) (+ (posn-x ufo) (/ UFO-WIDTH 2))))
+   (<= (posn-y shot) (+ (posn-y ufo) (+ (/ UFO-HEIGHT 2) (/ UFO-DIAMETER 2))))))
+   
+
+; Posn -> Posn 
+; ???
+(check-satisfied (ufo-create (make-posn 1 1)) not=-1-1?)
+(define (ufo-create p)
+  (ufo-check-create
+     p (make-posn (random (- WIDTH 20)) (random (- HEIGHT 20)))))
+ 
+; Posn Posn -> Posn 
+; generative recursion 
+; ???
+(define (ufo-check-create p candidate)
+  (if (equal? p candidate) (ufo-create p) candidate))
+ 
+; Posn -> Boolean
+; use for testing only 
+(define (not=-1-1? p)
+  (not (and (= (posn-x p) 1) (= (posn-y p) 1))))
+
+; UFO -> UFO
+; oscillate between a range in the UFO's horizontal plane
+(define (ufo-vibrate ufo) (make-posn (posn-x ... (posn-y ufo))))
 
 ; UFO -> UFO
 ; moves the UFO
@@ -121,25 +163,44 @@
 ; ShotList -> ShotList
 ; shoots a shot and adds it to the list of shot shots
 (check-expect (shoot tank0 '()) (list (make-posn (posn-x (tank-position tank0)) (posn-y (tank-position tank0)))))
-(define (shoot tank shotlist) (cons (make-posn (posn-x (tank-position tank)) (posn-y (tank-position tank))) shotlist))
+(define (shoot tank shotlist) (cons (make-posn (posn-x (tank-position tank)) (- (posn-y (tank-position tank)) (/ TANK-HEIGHT 2) (/ SHOT-SIZE 2))) shotlist))
 
 ;; World functions
 ; SpaceWar -> SpaceWar
 ; update the SpaceWar upon CPU clock tick
-(define (tock sw) ...)
+(define (tock sw) (make-sw (move-ufo (sw-ufo sw)) (sw-tank sw) (move-shotlist (sw-shotlist sw))))
 
 ; SpaceWar -> Image
 ; renders the SpaceWar
-(define (render sw)...)
-
-; SpaceWar -> Image
-; render the final SpaceWar state
-(define (render-end sw)...)
+(define (render sw) (place-images (list UFO TANK) (list (sw-ufo sw) (tank-position (sw-tank sw))) (render-shotlist (sw-shotlist sw))))
 
 ; SpaceWar KeyEvent -> SpaceWar
 ; updates the SpaceWar upon a KeyEvent
-(define (key-h sw ke)...)
+(define (key-h sw ke)
+  (cond
+    [(key=? "right" ke) (make-sw (sw-ufo sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
+    [(key=? "left" ke) (make-sw (sw-ufo sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
+    [(key=? " " ke) (make-sw (sw-ufo sw) (sw-tank sw) (shoot (sw-tank sw) (sw-shotlist sw)))]
+    [else sw]))
 
 ; SpaceWar -> Boolean
 ; determines whether the game has reached its final state
-(define (end? sw)...)
+(define (end? sw)
+  (cond
+    [(ufo-destroyed? (sw-ufo sw) (sw-shotlist sw)) #true]
+    [(ufo-breached? (sw-ufo sw) (sw-tank sw)) #true]
+    [else #false]))
+
+; SpaceWar -> Image
+; render the final SpaceWar state
+(define (render-end sw) (place-images (list UFO TANK (text "game over" 18 "crimson")) (list (sw-ufo sw) (tank-position (sw-tank sw)) (make-posn (/ WIDTH 2) (/ HEIGHT 2))) (render-shotlist (sw-shotlist sw))))
+
+; SpaceWar -> Image
+; main game
+(define (space-war rate)
+  (big-bang sw0
+    [on-tick tock rate]
+    [on-draw render]
+    [on-key key-h]
+    [stop-when end? render-end]
+    [state #t]))
