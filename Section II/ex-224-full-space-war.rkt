@@ -83,15 +83,6 @@
 (check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.95)) tank0) #true)
 (define (ufo-breached? ufo tank) (>= (posn-y ufo) (posn-y (tank-position tank))))
 
-; UFO -> Boolean
-; checks whether the UFO has crashed against the tank
-(define (ufo-crashed? ufo tank)
-  ; Gotta check that it's within a range of collision, not just the same posn
-  ...)
-
-; UFO -> Boolean
-; checks whether the UFO is withing crashing range
-
 ; Tank -> Boolean
 ; checks whether the tank is at scene limit
 (define (tank-against-width? tank)...)
