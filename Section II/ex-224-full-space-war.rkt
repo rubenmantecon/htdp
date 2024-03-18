@@ -5,16 +5,17 @@
 (require 2htdp/image)
 
 ;; Constants
-(define UFO-WIDTH 24)
+(define UFO-WIDTH 18)
 (define UFO-HEIGHT 2)
 (define UFO-DIAMETER 4)
 (define TANK-WIDTH 8)
 (define TANK-HEIGHT 6)
 (define SHOT-SIZE 4)
 (define UFO (overlay
-             (rectangle UFO-WIDTH UFO-HEIGHT "solid" "yellow")
-             (circle UFO-DIAMETER "solid" "royal blue")))
-(define SHOT (triangle SHOT-SIZE "solid" "magenta"))
+             (circle UFO-DIAMETER "solid" "purple")
+             (rectangle UFO-WIDTH UFO-HEIGHT "solid" "royal blue")
+             ))
+(define SHOT (triangle SHOT-SIZE "solid" "crimson"))
 (define TANK (rectangle TANK-WIDTH TANK-HEIGHT "solid" "dark olive green"))
 (define WIDTH 250)
 (define HEIGHT 200)
