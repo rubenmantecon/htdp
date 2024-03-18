@@ -85,7 +85,9 @@
 
 ; Tank -> Boolean
 ; checks whether the tank is at scene limit
-(define (tank-against-width? tank)...)
+(define (tank-against-width? tank) (or
+                                    (equal? (+ (posn-x (tank-position tank)) TANK-WIDTH) WIDTH)
+                                    (equal? (- (posn-x (tank-position tank)) TANK-WIDTH) 0)))
 
 ; UFO ShotList -> Boolean
 ; checks whether a shot has hit the UFO
@@ -93,15 +95,33 @@
 
 ; UFO -> UFO
 ; moves the UFO
-(define (move-ufo ufo)...)
+(define (move-ufo ufo) (make-posn (posn-x ufo) (add1 (posn-y ufo))))
 
 ; Tank KeyEvent -> Tank
 ; moves the tank
-(define (move-tank tank ke)...)
+(define (move-tank tank ke)
+  (cond
+    [(tank-against-width? tank) (if (key=? "right" (tank-direction tank))
+                                    (make-tank (make-posn (sub1 (posn-x (tank-position tank))) (posn-y (tank-position tank))) "left")
+                                    (make-tank (make-posn (add1 (posn-x (tank-position tank))) (posn-y (tank-position tank))) "right"))]
+    [(key=? "right" ke) (make-tank (make-posn (add1 (posn-x (tank-position tank))) (posn-y (tank-position tank))) ke)]
+    [(key=? "left" ke) (make-tank (make-posn (sub1 (posn-x (tank-position tank))) (posn-y (tank-position tank))) ke)]
+    [else tank]
+    ))
 
 ; ShotList -> ShotList
-; moves the shots currently in space
-(define (move-shotlist shotlist)...)
+; moves the shot shots in space
+(check-expect (move-shotlist '()) '())
+(check-expect (move-shotlist shotlist0) (list (make-posn 40 99) (make-posn 80 99)))
+(define (move-shotlist shotlist)
+  (cond
+    [(empty? shotlist) '()]
+    [else (cons (make-posn (posn-x (first shotlist)) (sub1 (posn-y (first shotlist)))) (move-shotlist (rest shotlist)))]))
+
+; ShotList -> ShotList
+; shoots a shot and adds it to the list of shot shots
+(check-expect (shoot tank0 '()) (list (make-posn (posn-x (tank-position tank0)) (posn-y (tank-position tank0)))))
+(define (shoot tank shotlist) (cons (make-posn (posn-x (tank-position tank)) (posn-y (tank-position tank))) shotlist))
 
 ;; World functions
 ; SpaceWar -> SpaceWar
