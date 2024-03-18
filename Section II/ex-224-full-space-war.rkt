@@ -8,9 +8,9 @@
 (define UFO-WIDTH 18)
 (define UFO-HEIGHT 2)
 (define UFO-DIAMETER 4)
-(define TANK-WIDTH 8)
+(define TANK-WIDTH 12)
 (define TANK-HEIGHT 6)
-(define SHOT-SIZE 4)
+(define SHOT-SIZE 8)
 (define UFO (overlay
              (circle UFO-DIAMETER "solid" "purple")
              (rectangle UFO-WIDTH UFO-HEIGHT "solid" "royal blue")
