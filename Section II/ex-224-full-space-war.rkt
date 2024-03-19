@@ -101,17 +101,25 @@
 
 ; UFO -> Boolean
 ; checks whether the UFO has reached the bottom of the scene
-(check-expect (ufo-breached? ufo0 tank0) #false)
-(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.89)) tank0) #false)
-(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.90)) tank0) #true)
-(check-expect (ufo-breached? (make-posn (/ WIDTH 2) (* HEIGHT 0.95)) tank0) #true)
-(define (ufo-breached? ufo tank) (>= (posn-y ufo) (posn-y (tank-position tank))))
+(check-expect (ufoarmy-breached? ufoarmy0 tank0) #false)
+(define (ufoarmy-breached? ufoarmy tank)
+  (cond
+    [(empty? ufoarmy) #false]
+    [else (if (>= (posn-y (ufo-position (first ufoarmy))) (posn-y (tank-position tank))) #true (ufoarmy-breached? (rest ufoarmy) tank))])
+  )
 
 ; Tank -> Boolean
 ; checks whether the tank is at scene limit
 (define (tank-against-width? tank) (or
                                     (equal? (+ (posn-x (tank-position tank)) (add1 (/ TANK-WIDTH 2))) WIDTH)
                                     (equal? (- (posn-x (tank-position tank)) (sub1(/ TANK-WIDTH 2))) 0)))
+
+; UFOArmy Shotlist -> Boolean
+; checkes whether the UFOArmy has beeen vanquished
+(define (ufoarmy-defeated? ufoarmy shotlist)
+  (cond
+    [(empty? (rest ufoarmy)) (first ufoarmy)]
+    [else (and (ufo-destroyed? (first ufoarmy) shotlist) (ufoarmy-defeated? (rest ufoarmy) shotlist))]))
 
 ; UFO ShotList -> Boolean
 ; checks whether the UFO has been shot down
@@ -132,9 +140,9 @@
 (define (within-hit-range? ufo shot) 
   (and
    (and
-    (>= (posn-x shot) (- (posn-x ufo) (/ UFO-WIDTH 2)))
-    (<= (posn-x shot) (+ (posn-x ufo) (/ UFO-WIDTH 2))))
-   (<= (posn-y shot) (+ (posn-y ufo) (+ (/ UFO-HEIGHT 2) (/ UFO-DIAMETER 2))))))
+    (>= (posn-x shot) (- (posn-x (ufo-position ufo)) (/ UFO-WIDTH 2)))
+    (<= (posn-x shot) (+ (posn-x (ufo-position ufo)) (/ UFO-WIDTH 2))))
+   (<= (posn-y shot) (+ (posn-y (ufo-position ufo)) (+ (/ UFO-HEIGHT 2) (/ UFO-DIAMETER 2))))))
    
 
 ; Posn -> Posn 
@@ -210,8 +218,8 @@
 ; determines whether the game has reached its final state
 (define (end? sw)
   (cond
-    [(ufo-destroyed? (sw-ufo sw) (sw-shotlist sw)) #true]
-    [(ufo-breached? (sw-ufo sw) (sw-tank sw)) #true]
+    [(ufoarmy-defeated? (sw-ufo sw) (sw-shotlist sw)) #true]
+    [(ufoarmy-breached? (sw-ufo sw) (sw-tank sw)) #true]
     [else #false]))
 
 ; SpaceWar -> Image
