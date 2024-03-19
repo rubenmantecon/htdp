@@ -65,8 +65,23 @@
 ;; Helper functions
 ; UFO -> Image
 ; render the UFO
-(check-expect (render-ufo ufo0) (place-image UFO (posn-x ufo0) (posn-y ufo0) BACKGROUND))
+(check-expect (render-ufo ufo0) (place-image UFO (posn-x (ufo-position ufo0)) (posn-y (ufo-position ufo0)) BACKGROUND))
 (define (render-ufo ufo) (place-image UFO (posn-x ufo) (posn-y ufo) BACKGROUND))
+
+; UFOArmy -> Image
+; render a UFOArmy
+(define (render-ufoarmy ufoarmy)
+  (cond
+    [(empty? (rest ufoarmy)) (place-image
+                             UFO
+                             (posn-x (ufo-position (first ufoarmy)))
+                             (posn-y (ufo-position (first ufoarmy)))
+                             BACKGROUND)]
+    [else (place-image
+   UFO
+   (posn-x (ufo-position (first ufoarmy)))
+   (posn-y (ufo-position (first ufoarmy)))
+   (render-ufoarmy (rest ufoarmy)))]))
 
 ; Tank -> Image
 ; render the tank
