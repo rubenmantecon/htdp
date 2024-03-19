@@ -56,7 +56,7 @@
 ; interpretation: the position of the shots in space
 ;
 ; A SpaceWar is a structure:
-(define-struct sw [ufo tank shotlist])
+(define-struct sw [ufoarmy tank shotlist])
 ; (make-sw Posn Tank ShotList)
 (define sw0 (make-sw ufo0 tank0 shotlist0))
 ; interpretation: the full state of the space war
