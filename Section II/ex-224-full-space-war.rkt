@@ -234,4 +234,3 @@
     [on-draw render]
     [on-key key-h]
     [stop-when end? render-end]
-    [state #t]))
