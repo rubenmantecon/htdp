@@ -51,7 +51,6 @@
 ;
 ; A ShotList is a List-of-Posn, and thus either:
 ; - '()
-; - (cons Posn '())
 ; - (cons Posn ShotList)
 (define shotlist0 (list (make-posn 40 100) (make-posn 80 100)))
 ; interpretation: the position of the shots in space
