@@ -35,6 +35,14 @@
 (define ufo0 (make-ufo (make-posn (/ WIDTH 2) (* HEIGHT 0.20)) "left"))
 ; interpretation: the position of the UFO in the scene, and which direction in the X axis it is going to
 ;
+; A UFOArmy is a NEList-of-UFOs, and thus either:
+; - (cons UFO '())
+; - (cons UFO UFOArmy)
+(define ufoarmy0 (list
+                  ufo0
+                  (make-ufo (make-posn (/ WIDTH 4) (* HEIGHT 0.15)) "right")
+                  (make-ufo (make-posn (/ WIDTH 6) (* HEIGHT 0.30)) "left")))
+; interpretation: a collection of many UFOs in space
 ; A Tank is a structure:
 (define-struct tank [position direction])
 ; (make-tank Posn String)
