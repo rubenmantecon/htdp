@@ -167,9 +167,16 @@
 ; oscillate between a range in the UFO's horizontal plane
 (define (ufo-vibrate ufo) (make-posn (posn-x ... (posn-y ufo))))
 
+; UFOArmy -> UFOArmy
+; moves the UFOArmy
+(define (move-ufoarmy ufoarmy)
+  (cond
+    [(empty? (rest ufoarmy)) (first ufoarmy)]
+    [else (cons (move-ufo (first ufoarmy)) (move-ufoarmy (rest ufoarmy)))]))
+
 ; UFO -> UFO
 ; moves the UFO
-(define (move-ufo ufo) (make-posn (posn-x ufo) (add1 (posn-y ufo))))
+(define (move-ufo ufo) (make-ufo (make-posn (posn-x ufo) (add1 (posn-y ufo))) (ufo-direction ufo)))
 
 ; Tank KeyEvent -> Tank
 ; moves the tank
@@ -234,3 +241,4 @@
     [on-draw render]
     [on-key key-h]
     [stop-when end? render-end]
+    [state #t]))
