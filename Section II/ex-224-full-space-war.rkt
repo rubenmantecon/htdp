@@ -29,16 +29,17 @@
 ; - "left"
 ; - "right"
 ; 
-; A UFO is a Posn
-; (make-posn x y)
-(define ufo0 (make-posn (/ WIDTH 2) (* HEIGHT 0.20)))
-; interpretation: the position of the UFO in the scene
+; A UFO is a structure:
+(define-struct ufo [position direction])
+; (make-ufo Posn String)
+(define ufo0 (make-ufo (make-posn (/ WIDTH 2) (* HEIGHT 0.20)) "left"))
+; interpretation: the position of the UFO in the scene, and which direction in the X axis it is going to
 ;
 ; A Tank is a structure:
 (define-struct tank [position direction])
 ; (make-tank Posn String)
 (define tank0 (make-tank (make-posn (/ WIDTH 2) (* HEIGHT 0.90)) "right"))
-; interpretation: the position of the tank in the scene, and which direction in the X axis is going
+; interpretation: the position of the tank in the scene, and which direction in the X axis it is going to
 ;
 ; A ShotList is a List-of-Posn, and thus either:
 ; - '()
