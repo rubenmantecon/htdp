@@ -64,18 +64,13 @@
 ;; Helper functions
 ; UFO -> Image
 ; render the UFO
-(check-expect (render-ufo ufo0) (place-image UFO (posn-x (ufo-position ufo0)) (posn-y (ufo-position ufo0)) BACKGROUND))
-(define (render-ufo ufo) (place-image UFO (posn-x ufo) (posn-y ufo) BACKGROUND))
+(define (render-ufo ufo) (place-image UFO (posn-x (ufo-position ufo)) (posn-y (ufo-position ufo)) BACKGROUND))
 
 ; UFOArmy -> Image
 ; render a UFOArmy
 (define (render-ufoarmy ufoarmy)
   (cond
-    [(empty? (rest ufoarmy)) (place-image
-                             UFO
-                             (posn-x (ufo-position (first ufoarmy)))
-                             (posn-y (ufo-position (first ufoarmy)))
-                             BACKGROUND)]
+    [(empty? ufoarmy) BACKGROUND]
     [else (place-image
    UFO
    (posn-x (ufo-position (first ufoarmy)))
@@ -133,9 +128,9 @@
 
 (check-expect (within-hit-range? ufo0 (first shotlist0)) #false)
 (check-expect (within-hit-range? ufo0 (second shotlist0)) #false)
-(check-expect (within-hit-range? ufo0 (make-posn (add1 (posn-x ufo0)) (add1 (posn-y ufo0)))) #true)
-(check-expect (within-hit-range? ufo0 (make-posn (+ 3 (posn-x ufo0)) (+ 3 (posn-y ufo0)))) #true)
-(check-expect (within-hit-range? ufo0 (make-posn (+ 5 (posn-x ufo0)) (+ 3 (posn-y ufo0)))) #false)
+(check-expect (within-hit-range? ufo0 (make-posn (add1 (posn-x (ufo-position ufo0))) (add1 (posn-y (ufo-position ufo0))))) #true)
+(check-expect (within-hit-range? ufo0 (make-posn (+ 3 (posn-x (ufo-position ufo0))) (+ 3 (posn-y (ufo-position ufo0))))) #true)
+(check-expect (within-hit-range? ufo0 (make-posn (+ 5 (posn-x (ufo-position ufo0))) (+ 3 (posn-y (ufo-position ufo0))))) #true)
 (define (within-hit-range? ufo shot) 
   (and
    (and
@@ -163,19 +158,18 @@
   (not (and (= (posn-x p) 1) (= (posn-y p) 1))))
 
 ; UFO -> UFO
-; oscillate between a range in the UFO's horizontal plane
-(define (ufo-vibrate ufo) (make-posn (posn-x ... (posn-y ufo))))
+; descend the UFO while it oscillates
+(define (advance-ufo ufo)
+  (cond
+    [(key=? "right" (ufo-direction ufo)) (make-ufo (make-posn (add1 (posn-x (ufo-position ufo))) (add1 (posn-y ufo))) "left")]
+    [(key=? "left" (ufo-direction ufo)) (make-ufo (make-posn (sub1 (posn-x (ufo-position ufo))) (add1 (posn-y ufo))) "right")]))
 
 ; UFOArmy -> UFOArmy
 ; moves the UFOArmy
-(define (move-ufoarmy ufoarmy)
+(define (advance-ufoarmy ufoarmy)
   (cond
     [(empty? (rest ufoarmy)) (first ufoarmy)]
-    [else (cons (move-ufo (first ufoarmy)) (move-ufoarmy (rest ufoarmy)))]))
-
-; UFO -> UFO
-; moves the UFO
-(define (move-ufo ufo) (make-ufo (make-posn (posn-x ufo) (add1 (posn-y ufo))) (ufo-direction ufo)))
+    [else (cons (advance-ufo (first ufoarmy)) (advance-ufoarmy (rest ufoarmy)))]))
 
 ; Tank KeyEvent -> Tank
 ; moves the tank
@@ -199,38 +193,42 @@
 
 ; ShotList -> ShotList
 ; shoots a shot and adds it to the list of shot shots
-(check-expect (shoot tank0 '()) (list (make-posn (posn-x (tank-position tank0)) (posn-y (tank-position tank0)))))
 (define (shoot tank shotlist) (cons (make-posn (posn-x (tank-position tank)) (- (posn-y (tank-position tank)) (/ TANK-HEIGHT 2) (/ SHOT-SIZE 2))) shotlist))
 
 ;; World functions
 ; SpaceWar -> SpaceWar
 ; update the SpaceWar upon CPU clock tick
-(define (tock sw) (make-sw (move-ufo (sw-ufo sw)) (sw-tank sw) (move-shotlist (sw-shotlist sw))))
+(define (tock sw) (make-sw (advance-ufoarmy (sw-ufoarmy sw)) (sw-tank sw) (move-shotlist (sw-shotlist sw))))
 
 ; SpaceWar -> Image
 ; renders the SpaceWar
-(define (render sw) (place-images (list UFO TANK) (list (sw-ufo sw) (tank-position (sw-tank sw))) (render-shotlist (sw-shotlist sw))))
+(define (render sw)
+  (place-image
+   UFO
+   (posn-x (ufo-position (first (sw-ufoarmy sw))))
+   (posn-y (ufo-position (first (sw-ufoarmy sw))))
+   (place-image TANK (posn-x (tank-position (sw-tank sw))) (posn-y (tank-position (sw-tank sw))) (render-shotlist (sw-shotlist sw)))))
 
 ; SpaceWar KeyEvent -> SpaceWar
 ; updates the SpaceWar upon a KeyEvent
 (define (key-h sw ke)
   (cond
-    [(key=? "right" ke) (make-sw (sw-ufo sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
-    [(key=? "left" ke) (make-sw (sw-ufo sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
-    [(key=? " " ke) (make-sw (sw-ufo sw) (sw-tank sw) (shoot (sw-tank sw) (sw-shotlist sw)))]
+    [(key=? "right" ke) (make-sw (sw-ufoarmy sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
+    [(key=? "left" ke) (make-sw (sw-ufoarmy sw) (move-tank (sw-tank sw) ke) (sw-shotlist sw))]
+    [(key=? " " ke) (make-sw (sw-ufoarmy sw) (sw-tank sw) (shoot (sw-tank sw) (sw-shotlist sw)))]
     [else sw]))
 
 ; SpaceWar -> Boolean
 ; determines whether the game has reached its final state
 (define (end? sw)
   (cond
-    [(ufoarmy-defeated? (sw-ufo sw) (sw-shotlist sw)) #true]
-    [(ufoarmy-breached? (sw-ufo sw) (sw-tank sw)) #true]
+    [(ufoarmy-defeated? (sw-ufoarmy sw) (sw-shotlist sw)) #true]
+    [(ufoarmy-breached? (sw-ufoarmy sw) (sw-tank sw)) #true]
     [else #false]))
 
 ; SpaceWar -> Image
 ; render the final SpaceWar state
-(define (render-end sw) (place-images (list UFO TANK (text "game over" 18 "crimson")) (list (sw-ufo sw) (tank-position (sw-tank sw)) (make-posn (/ WIDTH 2) (/ HEIGHT 2))) (render-shotlist (sw-shotlist sw))))
+(define (render-end sw) (place-images (list UFO TANK (text "game over" 18 "crimson")) (list (sw-ufoarmy sw) (tank-position (sw-tank sw)) (make-posn (/ WIDTH 2) (/ HEIGHT 2))) (render-shotlist (sw-shotlist sw))))
 
 ; SpaceWar -> Image
 ; main game
