@@ -463,6 +463,39 @@ The most relevant things for myself:
 
 This idea of composing a built-in function with a newly designed function is common. Naturally, people don’t design functions randomly and expect to find something in the chosen programming language to complement their design. **Instead, program designers plan ahead and design the function to the output that available functions deliver**. More generally still and as mentioned above, it is common to think about a solution as a composition of two computations and to develop an appropriate data collection with which to communicate the result of one computation to the second one, where each computation is implemented with a function.
 
-# 11.4 Auxiliary Functions that Generalize
+### 11.2 Composing functions
+
+> Design one function per task. Formulate auxiliary function definitions for every dependency between quantities in the problem.
+>
+> Design one template per data definition. Formulate auxiliary function definitions when one data definition points to a second data definition.
+
+These are not exclusive. This can mean -as in the second quote- that one function per task may be composed of a collection of subfunctions that deal with data definions that are part of the structure dealt with in the 'function per task' specified above.
+
+> Turning a template into a complete function definition means combining the values of the template’s sub-expressions into the final answer. As you do so, you might encounter several situations that suggest the need for auxiliary functions:
+>
+> 1. If the composition of values requires knowledge of a particular domain of application—for example, composing two (computer) images, accounting, music, or science—design an auxiliary function.
+>
+>    R: that is, if it needs to be plugged data resulting from a computation. Applies to recursion too (see 3).
+>
+> 2. If the composition of values requires a case analysis of the available values—for example, depends on a number being positive, zero, or negative— use a [cond](http://docs.racket-lang.org/htdp-langs/beginner.html#(form._((lib._lang%2Fhtdp-beginner..rkt)._cond))) expression. If the [cond](http://docs.racket-lang.org/htdp-langs/beginner.html#(form._((lib._lang%2Fhtdp-beginner..rkt)._cond))) looks complex, design an auxiliary function whose arguments are the template’s expressions and whose body is the [cond](http://docs.racket-lang.org/htdp-langs/beginner.html#(form._((lib._lang%2Fhtdp-beginner..rkt)._cond))) expression.
+>
+> 3. If the composition of values must process an element from a self-referential data definition—a list, a natural number, or something like those—design an auxiliary function.
+>
+> 4. If everything fails, you may need to design a **more general** function and define the main function as a specific use of the general function. This suggestion sounds counterintuitive, but it is called for in a remarkably large number of cases.
+
+> Before we continue, though, remember that the key to managing the design of programs is to maintain the often-mentioned
+>
+> > **Wish List**
+>
+> > Maintain a list of function headers that must be designed to complete a program. Writing down complete function headers ensures that you can test those portions of the programs that you have finished, which is useful even though many tests will fail. Of course, when the wish list is empty, all tests should pass and all functions should be covered by tests.
+
+### 11.4 Auxiliary Functions that Generalize
+
+On occasion an auxiliary function is not just a small helper function but a solution to a more general problem. Such auxiliaries are needed when a problem statement is too narrow.
 
 Revising the data definition during an initial exploration is normal; indeed, on occasion such revisions become necessary during the rest of the design process. As long as you stick to a systematic approach, though, **changes to the data definition can naturally be propagated through the rest of the design.** 
+
+### 13 Summary
+
+The main takeaway: complex problems call for a **decomposition** into separate problems. When you decompose a problem, you need two pieces: functions that solve the separate problems and data definitions that compose these separate solutions into a single one. To ensure that the composition works after you have spent time on the separate programs, you need to formulate your “wishes” together with the required data definitions.
+
