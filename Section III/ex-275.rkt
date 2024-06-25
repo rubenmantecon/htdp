@@ -39,7 +39,9 @@
                  [(empty? (rest lol)) (list (lettercount dict (first lol)))]
                  [else (cons (lettercount dict (first lol)) (lettercounts dict (rest lol)))]))
              )         
-            (first (sort (lettercounts dict LETTERS) (lambda (x y) (> (second x) (second y))))))]))
+            ;(first (sort (lettercounts dict LETTERS) (lambda (x y) (> (second x) (second y)))))
+            (argmax second (lettercounts dict LETTERS))
+            )]))
 
 ; Dictionary -> [List-of Dictionary]
 ; produce a list of Dictionaries, one per Letter
@@ -55,7 +57,7 @@
     [else (local
             (; Dictionary -> Dictionary
              ; generate a Dictionary containing the words that start with a letter
-             (define (words-by-first-letter/inner dict letter)
+             (define (dictionary-per-letter dict letter)
               (filter (lambda (x) (string-ci=? letter (string-ith x 0))) dict)
                )
 
@@ -63,9 +65,9 @@
              ; generate the full list of Dictionaries per letter
              (define (dictionaries-per-letter dict lol)
                (cond
-                 [(empty? (rest lol)) (words-by-first-letter/inner dict (first lol))]
-                 [else (if (empty? (words-by-first-letter/inner dict (first lol)))
+                 [(empty? (rest lol)) (dictionary-per-letter dict (first lol))]
+                 [else (if (empty? (dictionary-per-letter dict (first lol)))
                                    (dictionaries-per-letter dict (rest lol))
-                                   (cons (words-by-first-letter/inner dict (first lol)) (dictionaries-per-letter dict (rest lol))))]))
+                                   (cons (dictionary-per-letter dict (first lol)) (dictionaries-per-letter dict (rest lol))))]))
              )      
             (dictionaries-per-letter dict LETTERS))]))
