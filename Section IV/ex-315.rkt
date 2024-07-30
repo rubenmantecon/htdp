@@ -3,13 +3,16 @@
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ex-315) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp")) #f)))
 ;; Exercise 315. Design the function average-age. It consumes a family forest and a year (N).
 ;; From this data, it produces the average age of all child instances in the forest.
-;; Note If the trees in this forest overlap, the result isn’t a true average because some people contribute more than others.
-;; For this exercise, act as if the trees don’t overlap.
+
+; An FF (short for family forest) is one of: 
+; – '()
+; – (cons FT FF)
+; interpretation a family forest represents several
+; families (say, a town) and their ancestor trees
 
 (define-struct no-parent [])
 (define-struct person [father mother name date eyes])
 (define NP (make-no-parent))
-
 ; An FT is one of: 
 ; – NP
 ; – (make-child FT FT String N String)
@@ -27,23 +30,20 @@
 ; Youngest Generation: 
 (define Gustav (make-person Fred Eva "Gustav" 1988 "brown"))
 
-; A FF (short for Family Forest) is a [List-of FT]:
-(define ff1 (list Carl Bettina))
-(define ff2 (list Fred Eva))
-(define ff3 (list Fred Eva Carl))
-
-; [List-of FT] N -> Number
-; produces the average age of all child instances in the forest
-(check-expect (average-age ff1 2000) (/ (- 2000 (+ (person-date Carl) (person-date Bettina))) 2))
-(define (average-age l year)
+; FT -> Number
+; count how many children there are in a tree
+(check-expect (count-persons Carl) 1)
+(check-expect (count-persons Bettina) 1)
+(check-expect (count-persons Adam) 3)
+(check-expect (count-persons Dave) 3)
+(define (count-persons an-ftree)
   (cond
-    [(empty? l) 0]
-    [else
-     (/
-      (+
-         (average-age-ft (first l) year)
-         (average-age (rest l) year))
-      year)]))
+    [(no-parent? an-ftree) 0]
+    [else (add1
+           (+
+            (count-persons (person-mother an-ftree))
+            (count-persons (person-father an-ftree))))]))
+
 
 ; FT Number -> Number
 ; produce the average age of all children in an FT
@@ -56,3 +56,14 @@
            (- year (person-date ft))
            (average-age-ft (person-father ft) year)
            (average-age-ft (person-mother ft) year))]))
+
+; [List-of FT] Number -> Number
+; produce the average age of a forest
+(check-expect (average-age (list Gustav) 2000) 229)
+(define (average-age ff year)
+  (cond
+    [(empty? ff) 0]
+    [else (+
+           (average-age-ft (first ff) year)
+           (average-age (rest ff) year))]))
+
