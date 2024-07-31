@@ -7,7 +7,9 @@
 ; – Number
 ; - String
 ; - Symbol
-; – [List-of S-expr]
+; – SL
+
+; An SL is a [List-of S-expr]
 
 ; X -> Boolean
 ; determines if x is an sexp
@@ -21,15 +23,45 @@
 
 ; S-expr -> N
 ; count the number of symbols in a S-expr
-(check-expect (count '(1 2 3) 1) 0)
-(check-expect (count '(a 1 2 3 (2 3) (2 (3 3)))) 1)
-(check-expect (count '(a b c)) 3)
-(check-expect (count '(a (1 2) (b (c d)))) 4)
-(define (count sexp sy)
+(check-expect (count.v1 '() 1) 0)
+(check-expect (count.v1 '("1" "2" "3") 1) 0)
+(check-expect (count.v1 '(a 1 2 3 (2 3) (2 ('c c c))) 'c) 3)
+(check-expect (count.v1 '(a b c b) 'b) 2)
+(check-expect (count.v1 '(a (1 2) (b (c d))) 'a) 1)
+(define (count.v1 sexp sy)
   (cond
     [(empty? sexp) 0]
     [(number? sexp) 0]
     [(string? sexp) 0]
     [(symbol? sexp) (if (symbol=? sexp sy) 1 0)]
-    [else (+ (count (first sexp) sy) (count))]
-    ))
+    [else (local (; SL Symbol -> N
+                  ; count the symbols in a SL
+                  (define (count-sl sl sy)
+                    (cond
+                      [(empty? sl) 0]
+                      [else (+ (count.v1 (first sl) sy)
+                               (count-sl (rest sl) sy))])))
+            (count-sl sexp sy)
+    )]))
+
+;; For the second step, Integrate the data definition of SL into the one for S-expr. Simplify count again. Hint Use lambda.
+
+; An S-expr is one of: 
+; – Number
+; - String
+; - Symbol
+; – [List-of S-expr]
+
+; S-expr -> N
+; count the number of symbols in a S-expr
+(check-expect (count '() 1) 0)
+(check-expect (count '("1" "2" "3") 1) 0)
+(check-expect (count '(a 1 2 3 (2 3) (2 ('c c c))) 'c) 3)
+(check-expect (count '(a b c b) 'b) 2)
+(check-expect (count '(a (1 2) (b (c d))) 'a) 1)
+(define (count sexp sy)
+  (cond
+    [(number? sexp) 0]
+    [(string? sexp) 0]
+    [(symbol? sexp) (if (symbol=? sexp sy) 1 0)]
+    [else (foldl (lambda (sexp acc) (+ (count sexp sy) acc)) 0 sexp)]))
