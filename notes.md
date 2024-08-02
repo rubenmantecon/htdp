@@ -503,3 +503,5 @@ The main takeaway: complex problems call for a **decomposition** into separate p
 ## 14.3 Similarities in Data Definitions
 
 Roughly speaking, a parametric data definition abstracts from a reference to a particular collection of data in the same manner as a function abstracts from a particular value.
+
+R: one little detail I thought of for the design recipe. Of the operations that can be done upon the data structures chosen to represent information, which ones naturally align with the perceived nature of the information? Are they native to the language? Do they need to be constructed (say, operate upon struct fields in a particular way, instead of simply adding two numbers)?
