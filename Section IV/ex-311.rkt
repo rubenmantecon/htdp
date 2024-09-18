@@ -22,7 +22,7 @@
 (define Gustav (make-child Fred Eva "Gustav" 1988 "brown"))
 
 ; FT N -> N
-; produce the average of all child structures in an FT
+; produce the average age of all child structures in an FT
 (check-expect (average-age NP 2024) 0)
 (check-expect (average-age Carl 2024) 98)
 (check-expect (average-age Gustav 2024) (/ (+ (- 2024 (child-date Gustav))
@@ -35,12 +35,19 @@
 (define (average-age ft n)
   (cond
     [(no-parent? ft) 0]
-    [else (/
-           (+
-            (- n (child-date ft))
-            (average-age (child-father ft) n)
-            (average-age (child-mother ft) n))
-           (count-persons ft))]))
+    [else (/ (total-age ft n) (count-persons ft))]))
+
+; FT -> Number
+; determine the total age of an FT
+(check-expect (total-age Carl 2024) 98)
+(check-expect (total-age Gustav 2024) 349)
+(define (total-age ft n)
+  (cond
+    [(no-parent? ft) 0]
+    [else (+
+           (- n (child-date ft))
+           (total-age (child-father ft) n) 
+           (total-age (child-mother ft) n))]))
 
 ; FT -> N
 ; count the number of child structures in an FT
