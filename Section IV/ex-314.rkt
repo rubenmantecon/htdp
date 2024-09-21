@@ -54,12 +54,15 @@
 (define (blue-eyed-child-in-forest?.v2 loft)
   (ormap (lambda (ft) (string=? "blue" (child-eyes ft))) loft))
 
-; [List-of FT] -> Boolean
+; FT -> Boolean
 ; determine if an ancestor of the FT has blue eyes
 (check-expect (blue-eyed-ancestor? Eva) #false)
+(check-expect (blue-eyed-ancestor? Fred) #false)
 (define (blue-eyed-ancestor? ft)
   (cond
-    [(no-parent? ft) #false]
+    [(or
+      (no-parent? (child-father ft))
+      (no-parent? (child-mother ft))) #false]
     [else (or
            (blue-eyed-child? (child-father ft))
            (blue-eyed-child? (child-mother ft)))]))
