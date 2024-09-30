@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |327|) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp")) #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ex-327) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp")) #f)))
 (define-struct no-info [])
 (define NONE (make-no-info))
  
@@ -78,42 +78,58 @@
 (check-expect (create-bst A 10 'h) (make-node 15 'd
                                               (make-node 10 'h NONE NONE)
                                               (make-node 24 'i NONE NONE)))
-(check-expect (create-bst A 29 'b) (make-node 29 'b
-                                              (make-node 15 'd
-                                                         (make-node 10 'h NONE NONE)
-                                                         (make-node 24 'i NONE NONE))
-                                              NONE))
-;(check-expect (create-bst A 23 'x) (make-node
-;                                    15
-;                                    'd
-;                                    NONE
-;                                    (make-node 23 'x
-;                                               NONE
-;                                               (make-node
-;                                                24 'i NONE NONE))))
-;(check-expect (create-bst BST 100 'x) (make-node 63 'a
-;                                                 (make-node 29 'b
-;                                                            (make-node 15 'd
-;                                                                       (make-node 10 'h NONE NONE)
-;                                                                       (make-node 24 'i NONE NONE))
-;                                                            NONE)
-;                                                 (make-node 89 'c
-;                                                            (make-node 77 'l NONE NONE)
-;                                                            (make-node 95 'g NONE
-;                                                                       (make-node 99 'o NONE (make-node 100 'x NONE NONE))))))
-;(check-expect (create-bst BST 88 'x) (make-node 63 'a
-;                                                (make-node 29 'b
-;                                                           (make-node 15 'd
-;                                                                      (make-node 10 'h NONE NONE)
-;                                                                      (make-node 24 'i NONE NONE))
-;                                                           NONE)
-;                                                (make-node 88 ' x
-;                                                           (make-node 77 'l NONE NONE)
-;                                                           (make-node 89 'c
-;                                                                      NONE
-;                                                                      (make-node 95 'g
-;                                                                                 NONE
-;                                                                                 (make-node 99 'o NONE NONE))))))
+
+(check-expect (create-bst BST 100 'x) (make-node 63 'a
+                                                 (make-node 29 'b
+                                                            (make-node 15 'd
+                                                                       (make-node 10 'h NONE NONE)
+                                                                       (make-node 24 'i NONE NONE))
+                                                            NONE)
+                                                 (make-node 89 'c
+                                                            (make-node 77 'l NONE NONE)
+                                                            (make-node 95 'g NONE
+                                                                       (make-node 99 'o NONE (make-node 100 'x NONE NONE))))))
+(check-expect (create-bst BST 88 'x) (make-node
+                                      63
+                                      'a
+                                      (make-node
+                                       29
+                                       'b
+                                       (make-node
+                                        15
+                                        'd
+                                        (make-node
+                                         10
+                                         'h
+                                         NONE
+                                         NONE)
+                                        (make-node
+                                         24
+                                         'i
+                                         NONE
+                                         NONE))
+                                       NONE)
+                                      (make-node
+                                       89
+                                       'c
+                                       (make-node
+                                        77
+                                        'l
+                                        NONE
+                                        (make-node
+                                         88
+                                         'x
+                                         NONE
+                                         NONE))
+                                       (make-node
+                                        95
+                                        'g
+                                        NONE
+                                        (make-node
+                                         99
+                                         'o
+                                         NONE
+                                         NONE)))))
 
 (define (create-bst bst n s)
   (cond
