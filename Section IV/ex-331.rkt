@@ -18,4 +18,5 @@
 (define (how-many dir)
   (cond
     [(empty? dir) 0]
-    [else (+ (... (first dir)) (how-many (rest dir)))]))
+    [(string? (first dir)) (add1 (how-many (rest dir)))]
+    [else (+ (how-many (first dir)) (how-many (rest dir)))]))
